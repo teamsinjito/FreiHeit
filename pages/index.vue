@@ -15,6 +15,7 @@
             Vue.js. It was designed to empower developers to create amazing
             applications.
           </p>
+          <v-btn outlined @click="yyyChange" color="red">test</v-btn>
           <p>
             For more information on Vuetify, check out the
             <a
@@ -22,7 +23,7 @@
               target="_blank"
               rel="noopener noreferrer"
             >
-              documentation </a
+              {{test}}{{test2}} </a
             >.
           </p>
           <p>
@@ -80,14 +81,34 @@
   </v-row>
 </template>
 
-<script>
+<script lang='ts'>
 import Logo from '~/components/Logo.vue'
 import VuetifyLogo from '~/components/VuetifyLogo.vue'
+import {defineComponent,reactive,ref,toRefs} from '@nuxtjs/composition-api'
 
-export default {
-  components: {
-    Logo,
-    VuetifyLogo,
-  },
-}
+export default defineComponent({
+  setup() {
+    const yyyChange = () =>{
+      state.test= '67890'
+    }
+    
+    const state = reactive<{
+      test:string,
+      test2:string
+    }>({
+      test:'12345',
+      test2:'12345'
+    })
+
+    return{
+      ...toRefs(state),
+      yyyChange
+    }
+  }
+})
 </script>
+<style scoped>
+  .Triangle{
+    position: inherit!important;
+  }
+</style>

@@ -2,7 +2,7 @@
   <v-app>
     <v-navigation-drawer
       v-model="drawer"
-      :mini-variant="miniVariant" 
+      :mini-variant="miniVariant"
       :clipped="clipped"
       fixed
       app
@@ -10,12 +10,14 @@
     >
       <v-list-item>
         <v-list-item-avatar>
-          <v-img class="FreiHeitLogo" alt="FreiHeit Logo" src="/FreiHeit_Logo.png" ></v-img>
+          <v-img
+            class="FreiHeitLogo"
+            alt="FreiHeit Logo"
+            src="/FreiHeit_Logo.png"
+          ></v-img>
         </v-list-item-avatar>
         <v-list-item-content>
-          <v-list-item-title class="text-h4">
-            FreiHeit
-          </v-list-item-title>
+          <v-list-item-title class="text-h4"> FreiHeit </v-list-item-title>
           <v-list-item-subtitle class="text-subtitle-2">
             帳票作成アプリ
           </v-list-item-subtitle>
@@ -43,61 +45,34 @@
 
       <v-divider></v-divider>
 
-      <v-footer color="transparent">© 2021 Team SINJITO</v-footer>
-      <!-- <span>© 2021 Team SINJITO</span> -->
-      
+      <v-footer color="transparent justify-center text-caption"
+        >© 2021 Team SINJITO</v-footer
+      >
     </v-navigation-drawer>
 
-    
-      <v-app-bar :clipped-left="clipped" flat fixed app  color="transparent" class="pt-5 mb-5 pb-5">
-        <v-row class="align-center">
-          <v-col md="6" class="d-flex align-center">
-            <v-app-bar-nav-icon @click.stop="drawer = !drawer"/>
+    <v-app-bar
+      :clipped-left="clipped"
+      flat
+      app
+      color="transparent"
+      class="pt-2"
+    >
+      <v-container fluid>
+        <v-row class="d-flex align-center">
+          <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
 
-          <!-- <v-btn icon @click.stop="miniVariant = !miniVariant">
-            <v-icon>mdi-{{ `chevron-${miniVariant ? 'right' : 'left'}` }}</v-icon>
-          </v-btn>
-          <v-btn icon @click.stop="clipped = !clipped">
-            <v-icon>mdi-application</v-icon>
-          </v-btn>
-          <v-btn icon @click.stop="fixed = !fixed">
-            <v-icon>mdi-minus</v-icon>
-          </v-btn> -->
+          <v-app-bar-title v-text="title" />
+        </v-row>
+        <v-divider class="mt-1"></v-divider>
+      </v-container>
 
-            <v-app-bar-title v-text="title"/>
-
-          </v-col>
-
-          <v-col md="2" offset="2">
-
-          <v-select :items="selectItems" class="text-h5 pt-2" item-value="Foo" label="対象年度を選択"></v-select>
-        </v-col>
-      </v-row> 
-      <!-- <v-spacer /> -->
-      <!-- <v-btn icon @click.stop="rightDrawer = !rightDrawer">
-        <v-icon>mdi-menu</v-icon>
-      </v-btn> -->
-
-
-      </v-app-bar>
+      <!-- <v-select :items="selectItems" class="text-h5 pt-2" item-value="Foo" label="対象年度を選択"></v-select> -->
+    </v-app-bar>
     <v-main class="heroArea">
-        <v-container>
-          <nuxt />
-        </v-container>
+      <v-container fluid>
+        <nuxt />
+      </v-container>
     </v-main>
-    <!-- <v-navigation-drawer v-model="rightDrawer" :right="right" temporary fixed>
-      <v-list>
-        <v-list-item @click.native="right = !right">
-          <v-list-item-action>
-            <v-icon light> mdi-repeat </v-icon>
-          </v-list-item-action>
-          <v-list-item-title>Switch drawer (click me)</v-list-item-title>
-        </v-list-item>
-      </v-list>
-    </v-navigation-drawer> -->
-    <!-- <v-footer :absolute="!fixed" app>
-      <span>&copy; {{ new Date().getFullYear() }}</span>
-    </v-footer> -->
   </v-app>
 </template>
 
@@ -127,16 +102,15 @@ export default {
       title: 'Vuetify.js',
     }
   },
-} 
+}
 </script>
 <style scoped>
-  .heroArea{
-    background-image: url("/FreiHeit_Bg.jpeg");
-    width: 100%;
-    height: 100%;
-    background-size: cover;
-    position: fixed;
-    background-repeat: no-repeat;
-  }
-
+.heroArea {
+  background-image: url('/FreiHeit_Bg.jpeg');
+  width: 100%;
+  height: 100vh;
+  background-size: cover;
+  position: fixed;
+  background-repeat: no-repeat;
+}
 </style>

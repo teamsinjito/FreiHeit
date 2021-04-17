@@ -1,6 +1,12 @@
 <template>
-  <v-sheet color="white" outlined elevation="3" height="100%">
-    <v-banner>
+  <v-sheet
+    color="white"
+    outlined
+    elevation="3"
+    height="100%"
+    class="overflow-hidden"
+  >
+    <v-banner max-height="25vh">
       <v-icon slot="icon" color="success">mdi-animation</v-icon>
       <span class="font-weight-bold text-sm-h6">法定帳簿</span>
       <template #actions>
@@ -17,17 +23,20 @@
         </v-btn>
       </template>
     </v-banner>
+
     <v-data-table
       :headers="headers"
       dense
       disable-filtering
-      items-per-page="-1"
+      :items-per-page="100"
       disable-sort
-      hide-actions
       :items="item"
+      fixed-header
       hide-default-footer
-      class="elevation-1 ma-1 overflow-y-auto"
-      style="height: 100%"
+      class="elevation-1 ma-1"
+      height="70vh"
+      width="500px"
+      style="overflow: auto"
     >
       <template #[`item.mean`]="{ item }">
         <span class="text-caption">
@@ -62,12 +71,17 @@ export default defineComponent({
       { text: '車両燃料費', value: 'car' },
       { text: '交際費', value: 'meet' },
       { text: '福利厚生', value: 'service' },
+      { text: '荷造運賃', value: 'carry' },
+      { text: '広告宣伝費', value: 'senden' },
+      { text: '減価償却費', value: 'genka' },
+      { text: '貸倒金', value: 'notmoney' },
+      { text: '雑費', value: 'other' },
     ]
     const item = [
       {
         days: '31日',
         mean: 'アマゾン材料',
-        buy: 100000,
+        other: 100000,
       },
       {
         days: '4日',
@@ -77,7 +91,27 @@ export default defineComponent({
       {
         days: '5日',
         mean: 'アマゾン材料',
-        buy: 100000,
+        genka: 100000,
+      },
+      {
+        days: '6日',
+        mean: 'アマゾン材料',
+        senden: 100000,
+      },
+      {
+        days: '31日',
+        mean: 'アマゾン材料',
+        carry: 100000,
+      },
+      {
+        days: '4日',
+        mean: 'インターネット経費',
+        service: 100000,
+      },
+      {
+        days: '5日',
+        mean: 'アマゾン材料',
+        meet: 100000,
       },
       {
         days: '6日',
@@ -127,27 +161,7 @@ export default defineComponent({
       {
         days: '31日',
         mean: 'アマゾン材料',
-        buy: 100000,
-      },
-      {
-        days: '4日',
-        mean: 'インターネット経費',
-        buy: 100000,
-      },
-      {
-        days: '5日',
-        mean: 'アマゾン材料',
-        buy: 100000,
-      },
-      {
-        days: '6日',
-        mean: 'アマゾン材料',
-        send: 100000,
-      },
-      {
-        days: '31日',
-        mean: 'アマゾン材料',
-        buy: 100000,
+        car: 100000,
       },
       {
         days: '4日',
@@ -273,8 +287,8 @@ export default defineComponent({
 })
 </script>
 <style>
-.v-data-table-header {
-  background: #484848;
+.v-data-table--fixed-header thead th {
+  background: #484848 !important;
 }
 .v-data-table-header span {
   color: white;

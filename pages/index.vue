@@ -1,5 +1,12 @@
 <template>
-  <v-card color="transparent" outlined dark class="ml-sm-11">
+  <v-card
+    color="transparent"
+    outlined
+    dark
+    class="ml-sm-11"
+    width="100%"
+    height="100%"
+  >
     <v-card-title class="text-sm-h4 text-h5 font-weight-bold"
       >FreiHeit&nbsp;&nbsp;使い方ガイド</v-card-title
     >
@@ -23,8 +30,6 @@
 </template>
 
 <script lang="ts">
-// import Logo from '~/components/Logo.vue'
-// import VuetifyLogo from '~/components/VuetifyLogo.vue'
 import { defineComponent, reactive, toRefs } from '@nuxtjs/composition-api'
 
 export default defineComponent({

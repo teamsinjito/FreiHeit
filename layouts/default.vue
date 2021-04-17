@@ -60,16 +60,14 @@
       <v-container fluid>
         <v-row class="d-flex align-center">
           <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
-
           <v-app-bar-title v-text="title" />
         </v-row>
         <v-divider class="mt-1"></v-divider>
       </v-container>
-
-      <!-- <v-select :items="selectItems" class="text-h5 pt-2" item-value="Foo" label="対象年度を選択"></v-select> -->
     </v-app-bar>
+
     <v-main class="heroArea">
-      <v-container fluid>
+      <v-container fluid class="fill-height">
         <nuxt />
       </v-container>
     </v-main>

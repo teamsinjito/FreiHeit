@@ -1,299 +1,109 @@
 <template>
   <v-sheet
-    color="white"
-    outlined
-    elevation="3"
     height="100%"
+    width="100%"
+    color="transparent"
     class="overflow-hidden"
   >
-    <v-banner max-height="25vh">
-      <v-icon slot="icon" color="success">mdi-animation</v-icon>
-      <span class="font-weight-bold text-sm-h6">法定帳簿</span>
-      <template #actions>
-        <v-col cols="6" sm="3">
-          <v-select
-            class="text-sm-h5 pt-2"
-            item-value="Foo"
-            label="対象年度を選択"
-          ></v-select>
-        </v-col>
-        <v-btn color="success" class="text-button" outlined>
-          エクスポート
-          <v-icon light>mdi-menu-down</v-icon>
-        </v-btn>
-      </template>
-    </v-banner>
-
-    <v-data-table
-      :headers="headers"
-      dense
-      disable-filtering
-      :items-per-page="100"
-      disable-sort
-      :items="item"
-      fixed-header
-      hide-default-footer
-      class="elevation-1 ma-1"
-      height="70vh"
-      width="500px"
-      style="overflow: auto"
-    >
-      <template #[`item.mean`]="{ item }">
-        <span class="text-caption">
-          {{ item.mean }}
-        </span>
-      </template>
-    </v-data-table>
+    <!-- ヘッダー項目 -->
+    <header-bar></header-bar>
+    <v-divider></v-divider>
+    <v-card flat rounded="0" class="mb-2 py-5">
+      <v-card-text>
+        <v-row
+          ><v-col cols="12" sm="3">
+            <v-expansion-panels focusable multiple>
+              <v-expansion-panel>
+                <v-expansion-panel-header color="primary" class="white--text"
+                  >期間設定 </v-expansion-panel-header
+                ><v-expansion-panel-content class="pt-5">
+                  <v-slider
+                    min="1"
+                    max="12"
+                    thumb-color="primary"
+                    thumb-label="always"
+                    thumb-size="30"
+                    class="mt-5"
+                    ><template #thumb-label="{ value }">
+                      {{ value }}<span style="font-size: 0.2rem">月</span>
+                    </template>
+                    <template #label>
+                      <span class="text-caption font-weight-medium"
+                        >開始月</span
+                      >
+                    </template>
+                  </v-slider>
+                  <v-slider
+                    min="1"
+                    max="12"
+                    thumb-color="primary"
+                    thumb-label="always"
+                    thumb-size="30"
+                    class="mt-5"
+                    ><template #thumb-label="{ value }">
+                      {{ value }}<span style="font-size: 0.2rem">月</span>
+                    </template>
+                    <template #label>
+                      <span class="text-caption font-weight-medium"
+                        >終了月</span
+                      >
+                    </template>
+                  </v-slider></v-expansion-panel-content
+                ></v-expansion-panel
+              >
+              <v-expansion-panel>
+                <v-expansion-panel-header color="primary" class="white--text"
+                  >項目設定 </v-expansion-panel-header
+                ><v-expansion-panel-content class="pt-5">
+                  <v-row>
+                    <v-col cols="3" class="my-auto"
+                      ><span class="text-caption font-weight-medium"
+                        >項目</span
+                      ></v-col
+                    >
+                    <v-col cols="9">
+                      <v-select
+                        label="仕入"
+                        solo
+                        dense
+                        persistent-hint
+                        class="mt-6"
+                        ><template #label
+                          ><span class="text-caption">仕入</span></template
+                        ></v-select
+                      >
+                    </v-col>
+                  </v-row>
+                </v-expansion-panel-content></v-expansion-panel
+              >
+            </v-expansion-panels>
+          </v-col>
+          <v-col cols="12" sm="9"
+            ><v-expansion-panels>
+              <v-expansion-panel>
+                <v-expansion-panel-header color="primary" class="white--text"
+                  >取引先別レポート</v-expansion-panel-header
+                >
+                <v-expansion-panel-content class="pt-5">
+                  <v-img
+                    src="/revenue-report_2_sample.png"
+                    width="100%"
+                  ></v-img></v-expansion-panel-content></v-expansion-panel
+            ></v-expansion-panels>
+          </v-col>
+        </v-row>
+      </v-card-text>
+    </v-card>
   </v-sheet>
 </template>
 
 <script lang="ts">
 import { defineComponent } from '@nuxtjs/composition-api'
+import HeaderBar from '@/components/inspire/HeaderBar.vue'
 export default defineComponent({
-  setup() {
-    const headers = [
-      { text: '取引日付', value: 'days' },
-      { text: '摘要', value: 'mean' },
-      { text: '売上', value: 'send' },
-      { text: '雑収入等', value: 'about' },
-      { text: '仕入', value: 'buy' },
-      { text: '給料賃金', value: 'salary' },
-      { text: '外注工費', value: 'client' },
-      { text: '損害保険', value: 'crush' },
-      { text: '地代家賃', value: 'house' },
-      { text: '利子割引料', value: 'money' },
-      { text: '租税公課', value: 'tax' },
-      { text: '水道光熱費', value: 'water' },
-      { text: '旅費交通費', value: 'trip' },
-      { text: '通信費', value: 'connect' },
-      { text: '修繕費', value: 'fix' },
-      { text: '消耗品費', value: 'use' },
-      { text: '車両燃料費', value: 'car' },
-      { text: '交際費', value: 'meet' },
-      { text: '福利厚生', value: 'service' },
-      { text: '荷造運賃', value: 'carry' },
-      { text: '広告宣伝費', value: 'senden' },
-      { text: '減価償却費', value: 'genka' },
-      { text: '貸倒金', value: 'notmoney' },
-      { text: '雑費', value: 'other' },
-    ]
-    const item = [
-      {
-        days: '31日',
-        mean: 'アマゾン材料',
-        other: 100000,
-      },
-      {
-        days: '4日',
-        mean: 'インターネット経費',
-        buy: 100000,
-      },
-      {
-        days: '5日',
-        mean: 'アマゾン材料',
-        genka: 100000,
-      },
-      {
-        days: '6日',
-        mean: 'アマゾン材料',
-        senden: 100000,
-      },
-      {
-        days: '31日',
-        mean: 'アマゾン材料',
-        carry: 100000,
-      },
-      {
-        days: '4日',
-        mean: 'インターネット経費',
-        service: 100000,
-      },
-      {
-        days: '5日',
-        mean: 'アマゾン材料',
-        meet: 100000,
-      },
-      {
-        days: '6日',
-        mean: 'アマゾン材料',
-        send: 100000,
-      },
-      {
-        days: '31日',
-        mean: 'アマゾン材料',
-        buy: 100000,
-      },
-      {
-        days: '4日',
-        mean: 'インターネット経費',
-        buy: 100000,
-      },
-      {
-        days: '5日',
-        mean: 'アマゾン材料',
-        buy: 100000,
-      },
-      {
-        days: '6日',
-        mean: 'アマゾン材料',
-        send: 100000,
-      },
-      {
-        days: '31日',
-        mean: 'アマゾン材料',
-        buy: 100000,
-      },
-      {
-        days: '4日',
-        mean: 'インターネット経費',
-        buy: 100000,
-      },
-      {
-        days: '5日',
-        mean: 'アマゾン材料',
-        buy: 100000,
-      },
-      {
-        days: '6日',
-        mean: 'アマゾン材料',
-        send: 100000,
-      },
-      {
-        days: '31日',
-        mean: 'アマゾン材料',
-        car: 100000,
-      },
-      {
-        days: '4日',
-        mean: 'インターネット経費',
-        buy: 100000,
-      },
-      {
-        days: '5日',
-        mean: 'アマゾン材料',
-        buy: 100000,
-      },
-      {
-        days: '6日',
-        mean: 'アマゾン材料',
-        send: 100000,
-      },
-      {
-        days: '31日',
-        mean: 'アマゾン材料',
-        buy: 100000,
-      },
-      {
-        days: '4日',
-        mean: 'インターネット経費',
-        buy: 100000,
-      },
-      {
-        days: '5日',
-        mean: 'アマゾン材料',
-        buy: 100000,
-      },
-      {
-        days: '6日',
-        mean: 'アマゾン材料',
-        send: 100000,
-      },
-      {
-        days: '31日',
-        mean: 'アマゾン材料',
-        buy: 100000,
-      },
-      {
-        days: '4日',
-        mean: 'インターネット経費',
-        buy: 100000,
-      },
-      {
-        days: '5日',
-        mean: 'アマゾン材料',
-        buy: 100000,
-      },
-      {
-        days: '6日',
-        mean: 'アマゾン材料',
-        send: 100000,
-      },
-      {
-        days: '31日',
-        mean: 'アマゾン材料',
-        buy: 100000,
-      },
-      {
-        days: '4日',
-        mean: 'インターネット経費',
-        buy: 100000,
-      },
-      {
-        days: '5日',
-        mean: 'アマゾン材料',
-        buy: 100000,
-      },
-      {
-        days: '6日',
-        mean: 'アマゾン材料',
-        send: 100000,
-      },
-      {
-        days: '31日',
-        mean: 'アマゾン材料',
-        buy: 100000,
-      },
-      {
-        days: '4日',
-        mean: 'インターネット経費',
-        buy: 100000,
-      },
-      {
-        days: '5日',
-        mean: 'アマゾン材料',
-        buy: 100000,
-      },
-      {
-        days: '6日',
-        mean: 'アマゾン材料',
-        send: 100000,
-      },
-      {
-        days: '31日',
-        mean: 'アマゾン材料',
-        buy: 100000,
-      },
-      {
-        days: '4日',
-        mean: 'インターネット経費',
-        buy: 100000,
-      },
-      {
-        days: '5日',
-        mean: 'アeマゾン材料',
-        buy: 100000,
-      },
-      {
-        days: '6日',
-        mean: 'アrマゾン材料',
-        send: 100000,
-      },
-    ]
-    return {
-      headers,
-      item,
-    }
+  components: {
+    HeaderBar,
   },
+  setup() {},
 })
 </script>
-<style>
-.v-data-table--fixed-header thead th {
-  background: #484848 !important;
-}
-.v-data-table-header span {
-  color: white;
-}
-.v-data-table tr:nth-child(odd) td {
-  background: #e1eedc;
-}
-</style>

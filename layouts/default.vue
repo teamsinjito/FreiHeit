@@ -1,29 +1,18 @@
 <template>
   <v-app>
-    <v-navigation-drawer
-      v-model="drawer"
-      :mini-variant="miniVariant"
-      :clipped="clipped"
-      fixed
-      app
-      dark
-    >
-      <v-list-item>
-        <v-list-item-avatar>
-          <v-img
-            class="FreiHeitLogo"
-            alt="FreiHeit Logo"
-            src="/FreiHeit_Logo.png"
-          ></v-img>
+    <nav-var :minimini="mini" @miniminiC="miniminiChengeP"></nav-var>
+    <!-- サイドバー -->
+    <!-- <v-navigation-drawer :mini-variant="mini" fixed permanent app dark>
+      <v-list-item class="px-2 my-sm-1">
+        <v-list-item-avatar color="primary">
+          <v-icon>mdi-home-city</v-icon>
         </v-list-item-avatar>
-        <v-list-item-content>
-          <v-list-item-title class="text-h4"> FreiHeit </v-list-item-title>
-          <v-list-item-subtitle class="text-subtitle-2">
-            帳票作成アプリ
-          </v-list-item-subtitle>
-        </v-list-item-content>
-      </v-list-item>
 
+        <v-list-item-title>{{ office }}</v-list-item-title>
+        <v-btn icon @click.stop="mini = !mini">
+          <v-icon>mdi-chevron-left</v-icon>
+        </v-btn>
+      </v-list-item>
       <v-divider></v-divider>
 
       <v-list>
@@ -38,77 +27,99 @@
             <v-icon>{{ item.icon }}</v-icon>
           </v-list-item-action>
           <v-list-item-content>
-            <v-list-item-title v-text="item.title" />
+            <v-list-item-title class="text-subtitle-2" v-text="item.title" />
           </v-list-item-content>
         </v-list-item>
       </v-list>
 
       <v-divider></v-divider>
+    </v-navigation-drawer> -->
 
-      <v-footer color="transparent justify-center text-caption"
-        >© 2021 Team SINJITO</v-footer
-      >
-    </v-navigation-drawer>
-
-    <v-app-bar
-      :clipped-left="clipped"
-      flat
-      app
-      color="transparent"
-      class="pt-2"
-    >
-      <v-container fluid>
-        <v-row class="d-flex align-center">
-          <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
-          <v-app-bar-title v-text="title" />
-        </v-row>
-        <v-divider class="mt-1"></v-divider>
-      </v-container>
+    <!-- ヘッダー -->
+    <v-app-bar :clipped-left="false" app>
+      <!-- アプリ名 -->
+      <v-app-bar-nav-icon @click.stop="mini = !mini" />
+      <v-app-bar-title v-text="title"></v-app-bar-title>
+      <v-spacer></v-spacer>
+      <!-- ヘルプアイコン -->
+      <v-btn icon>
+        <v-icon>mdi-progress-question</v-icon>
+      </v-btn>
+      <!-- 設定アイコン -->
+      <v-menu offset-y>
+        <template #activator="{ on, attrs }">
+          <v-btn icon v-bind="attrs" v-on="on">
+            <v-icon>mdi-dots-vertical</v-icon>
+          </v-btn>
+        </template>
+        <v-list flat>
+          <v-list-item-group color="primary">
+            <v-list-item>
+              <v-list-item-icon>
+                <v-icon>mdi-calendar-month</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <v-list-item-title>会計期間：2021年度</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item>
+              <v-list-item-icon>
+                <v-icon>mdi-account-settings</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <v-list-item-title>ユーザ設定</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item>
+              <v-list-item-icon>
+                <v-icon>mdi-logout-variant</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <v-list-item-title>ログアウト</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+          </v-list-item-group>
+        </v-list>
+      </v-menu>
     </v-app-bar>
 
-    <v-main class="heroArea">
+    <!-- メイン -->
+    <v-main style="background-color: whitesmoke">
       <v-container fluid class="fill-height">
         <nuxt />
       </v-container>
     </v-main>
+
+    <!-- フッター -->
+    <v-footer color="justify-center text-caption">© 2021 Team SINJITO</v-footer>
   </v-app>
 </template>
 
-<script>
-export default {
-  data() {
+<script lang="ts">
+import { defineComponent, reactive, toRefs } from '@nuxtjs/composition-api'
+export default defineComponent({
+  setup() {
+    // const mini = false
+
+    const state = reactive<{
+      mini: boolean
+    }>({
+      mini: true,
+    })
+
+    const title = 'FreiHeit'
+
+    const miniminiChengeP = (miniVal: boolean) => {
+      state.mini = miniVal
+    }
+
     return {
-      clipped: false,
-      drawer: false,
-      fixed: false,
-      items: [
-        {
-          icon: 'mdi-apps',
-          title: 'Welcome',
-          to: '/',
-        },
-        {
-          icon: 'mdi-chart-bubble',
-          title: 'Inspire',
-          to: '/inspire',
-        },
-      ],
-      selectItems: ['Foo', 'Bar', 'Fizz', 'Buzz'],
-      miniVariant: false,
-      right: true,
-      rightDrawer: false,
-      title: 'Vuetify.js',
+      // mini,
+      ...toRefs(state),
+
+      title,
+      miniminiChengeP,
     }
   },
-}
+})
 </script>
-<style scoped>
-.heroArea {
-  background-image: url('/FreiHeit_Bg.jpeg');
-  width: 100%;
-  height: 100vh;
-  background-size: cover;
-  position: fixed;
-  background-repeat: no-repeat;
-}
-</style>

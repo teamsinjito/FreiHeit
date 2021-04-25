@@ -246,6 +246,7 @@ export default defineComponent({
   components: {
     HeaderBar,
   },
+  //   middleware: 'userAuth',
   setup() {
     const dialog = false
     const checkbox = false

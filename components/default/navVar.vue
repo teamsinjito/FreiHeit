@@ -59,6 +59,11 @@ export default defineComponent({
         to: '/inspire',
       },
       {
+        icon: 'mdi-chart-bubble',
+        title: 'チャート',
+        to: '/chart',
+      },
+      {
         icon: 'mdi-hexagon-slice-4',
         title: 'オプション',
         to: '/option',

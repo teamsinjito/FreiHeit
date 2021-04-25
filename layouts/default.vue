@@ -75,7 +75,9 @@
                 <v-icon>mdi-logout-variant</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
-                <v-list-item-title>ログアウト</v-list-item-title>
+                <v-list-item-title @click="logoutWithAuth0"
+                  >ログアウト</v-list-item-title
+                >
               </v-list-item-content>
             </v-list-item>
           </v-list-item-group>
@@ -98,7 +100,8 @@
 <script lang="ts">
 import { defineComponent, reactive, toRefs } from '@nuxtjs/composition-api'
 export default defineComponent({
-  setup() {
+  middleware: 'userAuth',
+  setup(_props, context) {
     // const mini = false
 
     const state = reactive<{
@@ -112,13 +115,17 @@ export default defineComponent({
     const miniminiChengeP = (miniVal: boolean) => {
       state.mini = miniVal
     }
-
+    const logoutWithAuth0 = () => {
+      window.alert('ログアウトします')
+      context.root.$auth.logout()
+    }
     return {
       // mini,
       ...toRefs(state),
 
       title,
       miniminiChengeP,
+      logoutWithAuth0,
     }
   },
 })

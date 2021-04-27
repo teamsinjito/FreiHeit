@@ -8,6 +8,11 @@
 <script lang="ts">
 import { defineComponent, reactive, toRefs } from '@nuxtjs/composition-api'
 import axios from 'axios'
+import { Users } from '../composables/useChart'
+// export interface UsersP {
+//   mail: string
+// }
+
 export default defineComponent({
   setup() {
     const state = reactive<{
@@ -31,8 +36,9 @@ export default defineComponent({
     }
     const axiosTest2 = () => {
       const response = axios
-        .post('/api/testcopy', 'data')
-        .then(() => {
+        .post<Users[]>('/api/testcopy', 'data')
+        .then((data) => {
+          console.log(data.data[0].mail)
           alert('pass2')
         })
         .catch(() => {
@@ -40,7 +46,6 @@ export default defineComponent({
         })
       return { response }
     }
-
     return { ...toRefs(state), axiosTest, axiosTest2 }
   },
 })

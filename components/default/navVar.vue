@@ -59,7 +59,7 @@ export default defineComponent({
         to: '/inspire',
       },
       {
-        icon: 'mdi-chart-bubble',
+        icon: 'mdi-chart-bar',
         title: 'チャート',
         to: '/chart',
       },

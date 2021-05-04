@@ -16,8 +16,34 @@ export const pool = new pg.Pool({
   host: env.DB_HOST,
   port: Number(env.DB_PORT),
 })
+// インターフェース
+export interface Users {
+  mail: string
+  id: string
+  createdAt: string
+  updatedAt: string
+}
 
 app.listen(8083, () => console.log('API Mock Server is running'))
+
+app.post('/getAllData', async (req, res) => {
+  let client
+  try {
+    client = await pool.connect()
+
+    const val = (await client.query('SELECT * FROM users')).rows as Users[]
+    if (val && val.length > 0) {
+      res.json(val)
+    } else {
+      res.json({})
+    }
+  } catch (e) {
+    console.log(e)
+    res.json({})
+  } finally {
+    if (client) client.release()
+  }
+})
 
 app.post('/testcopy', async (req, res) => {
   console.log(`DB_HOST:${env.DB_HOST}`)

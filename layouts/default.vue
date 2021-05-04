@@ -98,7 +98,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs } from '@nuxtjs/composition-api'
+import {
+  onMounted,
+  defineComponent,
+  reactive,
+  toRefs,
+} from '@nuxtjs/composition-api'
+import { getAllData } from '../composables/useDefault'
 export default defineComponent({
   middleware: 'userAuth',
   setup(_props, context) {
@@ -111,6 +117,11 @@ export default defineComponent({
     })
 
     const title = 'FreiHeit'
+
+    onMounted(async () => {
+      const allData = await getAllData()
+      console.log(allData)
+    })
 
     const miniminiChengeP = (miniVal: boolean) => {
       state.mini = miniVal

@@ -1,14 +1,26 @@
 import express from 'express'
-
 import { config } from 'dotenv'
 import pg from 'pg'
+import {
+  connectPathUsers,
+  connectPathRecordsManagement,
+  connectPathClients,
+  connectPathCosts,
+  connectPathSubjects,
+  connectPathSubjectsGroup,
+} from '../composables/routing'
+import {
+  Users,
+  RecordsManagement,
+  Clients,
+  Costs,
+  Subjects,
+  SubjectsGroup,
+} from '../composables/interface'
+import { sqlText } from '../composables/sql'
 
-import { getMail } from '../composables/useChart'
-
-config()
 const env = process.env
 const app = express()
-
 export const pool = new pg.Pool({
   database: env.DB_DATABASE,
   user: env.DB_USERNAME,
@@ -16,39 +28,58 @@ export const pool = new pg.Pool({
   host: env.DB_HOST,
   port: Number(env.DB_PORT),
 })
-// インターフェース
-export interface Users {
-  mail: string
-  id: string
-  createdAt: string
-  updatedAt: string
-}
+config()
 
 app.listen(8083, () => console.log('API Mock Server is running'))
+app.use(express.json())
 
-app.post('/getAllData', async (req, res) => {
-  let client
+interface getAllDataPostVal {
+  name: string
+  query: string
+  table: string
+}
+
+app.post(connectPathUsers, async (req, res) => {
+  const reqVal = sqlText.filter((sqlText) =>
+    sqlText.name.match(req.body.key as string)
+  )
+  res.json(await sql(reqVal[0]))
+})
+
+const sql = async (reqVal: getAllDataPostVal) => {
+  const client = await pool.connect()
   try {
-    client = await pool.connect()
-
-    const val = (await client.query('SELECT * FROM users')).rows as Users[]
+    const val = (await client.query(reqVal.query)).rows
     if (val && val.length > 0) {
-      res.json(val)
+      if (reqVal.table === 'Users') {
+        console.log(val)
+        return val as Users[]
+      } else if (reqVal.table === 'RecordsManagement') {
+        return val as RecordsManagement[]
+      } else if (reqVal.table === 'Clients') {
+        return val as Clients[]
+      } else if (reqVal.table === 'Costs') {
+        return val as Costs[]
+      } else if (reqVal.table === 'Subjects') {
+        return val as Subjects[]
+      } else {
+        return val as SubjectsGroup[]
+      }
     } else {
-      res.json({})
+      return {}
     }
   } catch (e) {
     console.log(e)
-    res.json({})
+    return {}
   } finally {
     if (client) client.release()
   }
-})
+}
 
 app.post('/testcopy', async (req, res) => {
   console.log(`DB_HOST:${env.DB_HOST}`)
 
-  const resData = await getMail()
+  const resData = {}
   console.log('========ここはIndex=======')
   console.log(resData)
   console.log('============================')

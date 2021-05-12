@@ -16,8 +16,9 @@ import {
   Costs,
   Subjects,
   SubjectsGroup,
+  getAllDataPostVal,
 } from '../composables/interface'
-import { sqlText } from '../composables/sql'
+import { sqlText } from './sql'
 
 const env = process.env
 const app = express()
@@ -33,23 +34,34 @@ config()
 app.listen(8083, () => console.log('API Mock Server is running'))
 app.use(express.json())
 
-interface getAllDataPostVal {
-  name: string
-  query: string
-  table: string
-}
-
 app.post(connectPathUsers, async (req, res) => {
-  const reqVal = sqlText.filter((sqlText) =>
-    sqlText.name.match(req.body.key as string)
-  )
-  res.json(await sql(reqVal[0]))
-})
-
-const sql = async (reqVal: getAllDataPostVal) => {
   const client = await pool.connect()
   try {
-    const val = (await client.query(reqVal.query)).rows
+    const sqll = `select * from users
+    where auth_id = '${req.body.key as string}'`
+    client.query(sqll, (err, result) => {
+      if (!err) {
+        console.log(result.rows[0])
+        res.json(result.rows[0])
+      }
+    })
+  } catch (e) {
+    console.log(e)
+    return {}
+  } finally {
+    if (client) client.release()
+  }
+
+  // const reqVal = sqlText.filter((sqlText) =>
+  //   sqlText.name.match(req.body.key.table as string)
+  // )
+  // res.json(await sql(reqVal[0], [req.body.key.id as string]))
+})
+
+const sql = async (reqVal: getAllDataPostVal, prm: string[]) => {
+  const client = await pool.connect()
+  try {
+    const val = (await client.query(reqVal.query, prm)).rows
     if (val && val.length > 0) {
       if (reqVal.table === 'Users') {
         console.log(val)

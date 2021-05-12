@@ -41,3 +41,10 @@ export interface Subjects {
 export interface SubjectsGroup {
   name: string
 }
+
+// クエリインターフェース
+export interface getAllDataPostVal {
+  name: string
+  query: string
+  table: string
+}

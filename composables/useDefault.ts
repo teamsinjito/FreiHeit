@@ -16,11 +16,12 @@ import {
   SubjectsGroup,
 } from '../composables/interface'
 
-export const getAllData = async (): Promise<Users | undefined> => {
+export const getAllData = async (id: string): Promise<Users | undefined> => {
   let response
+  const table = 'uR' as string
   await axios
     .post<Users>(`/api${connectPathUsers}`, {
-      key: 'uR',
+      key: { table, id },
     })
     .then((data) => {
       alert('getAllData関数終わり')

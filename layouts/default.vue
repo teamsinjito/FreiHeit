@@ -119,7 +119,8 @@ export default defineComponent({
     const title = 'FreiHeit'
 
     onMounted(async () => {
-      const allData = await getAllData()
+      console.log(context.root.$store.$auth.user)
+      const allData = await getAllData(context.root.$store.$auth.user.sub)
       console.log(allData)
     })
 

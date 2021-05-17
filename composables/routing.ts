@@ -1,6 +1,2 @@
 export const connectPathUsers = '/getAllDataUsers'
-export const connectPathRecordsManagement = '/getAllDataRecordsManagement'
-export const connectPathClients = '/getAllDataClients'
-export const connectPathCosts = '/getAllDataCosts'
-export const connectPathSubjects = '/getAllDataSubjects'
-export const connectPathSubjectsGroup = '/getAllDataSubjectsGroup'
+export const connectPathPushRecordsManagement = '/pushRecordsManagement'

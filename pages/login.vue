@@ -5,16 +5,27 @@
     color="transparent"
     class="overflow-hidden"
   >
-    <v-container>
-      <v-row
-        ><v-col cols="12"><v-card-title>FreiHeit</v-card-title></v-col>
-        <v-col cols="12">
-          <v-btn rounded color="primary" dark @click="loginWithAuthZero">
-            ログイン
-          </v-btn>
-        </v-col>
-      </v-row>
-    </v-container>
+    <v-card class="mx-auto my-12" max-width="374" elevation="14">
+      <v-img height="250" src="/login_bg.png"></v-img>
+
+      <v-card-title>FreiHeit</v-card-title>
+
+      <v-card-text>
+        FreiHeitとは、確定申告用の帳簿を簡単に作ることができるアプリです。
+      </v-card-text>
+
+      <v-divider class="mx-4"></v-divider>
+
+      <v-card-actions>
+        <v-row class="my-5">
+          <v-col cols="12" class="text-center">
+            <v-btn rounded color="primary" dark @click="loginWithAuthZero">
+              ログイン画面へ
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-card-actions>
+    </v-card>
   </v-sheet>
 </template>
 <script>

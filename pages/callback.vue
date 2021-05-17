@@ -1,14 +1,16 @@
 <template>
-  <div class="container has-text-centered mt-6">
-    <div>
-      <h1 class="title">sample-nuxt-auth</h1>
-      <h2 class="subtitle">Callback</h2>
-      <p>Please Wating...</p>
-    </div>
-  </div>
+  <v-col sm="12" class="text-center">
+    <v-progress-circular
+      :size="50"
+      :width="10"
+      color="primary"
+      indeterminate
+      :value="40"
+    ></v-progress-circular>
+  </v-col>
 </template>
-<script>
-import { defineComponent } from '@vue/composition-api'
+<script lang="ts">
+import { defineComponent } from '@nuxtjs/composition-api'
 
 export default defineComponent({
   layout: 'loginLayout',

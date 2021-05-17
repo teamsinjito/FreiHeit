@@ -2,7 +2,7 @@ import { pool } from '../api/index'
 
 // インターフェース
 export interface Users {
-  mail: string
+  authId: string
 }
 
 export const getMail = async () => {

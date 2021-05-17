@@ -132,7 +132,7 @@ export default defineComponent({
       const response = axios
         .post<Users[]>('/api/testcopy', 'data')
         .then((data) => {
-          console.log(data.data[0].mail)
+          console.log(data.data[0].authId)
           alert('pass2')
         })
         .catch(() => {

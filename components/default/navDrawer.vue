@@ -1,6 +1,6 @@
 <template>
   <!-- サイドバー -->
-  <v-navigation-drawer :mini-variant="minimini" fixed permanent app dark>
+  <v-navigation-drawer :mini-variant="mini" fixed permanent app dark>
     <!-- 会社名 -->
     <v-list-item class="px-2 my-sm-1">
       <v-list-item-avatar color="primary">
@@ -8,7 +8,7 @@
       </v-list-item-avatar>
 
       <v-list-item-title>{{ office }}</v-list-item-title>
-      <v-btn icon @click.stop="miniminiChenge">
+      <v-btn icon @click.stop="switchNavVarCall">
         <v-icon>mdi-chevron-left</v-icon>
       </v-btn>
     </v-list-item>
@@ -36,17 +36,27 @@
   </v-navigation-drawer>
 </template>
 <script lang="ts">
-import { defineComponent } from '@vue/composition-api'
+import {
+  defineComponent,
+  onBeforeMount,
+  reactive,
+  toRefs,
+} from '@vue/composition-api'
+import { useGlobalState } from '~/composables/useDefault'
 
 export default defineComponent({
   props: {
-    minimini: {
+    mini: {
       type: Boolean,
       required: true,
     },
   },
-  setup(props: { minimini: boolean }, ctx) {
-    const office = 'CruxSystem'
+  setup(props: { mini: boolean }, ctx) {
+    const state = reactive<{
+      office: string
+    }>({
+      office: '名無し',
+    })
     const items = [
       {
         icon: 'mdi-apps',
@@ -54,13 +64,8 @@ export default defineComponent({
         to: '/',
       },
       {
-        icon: 'mdi-chart-bubble',
-        title: '収支レポート',
-        to: '/inspire',
-      },
-      {
         icon: 'mdi-chart-bar',
-        title: 'チャート',
+        title: '収支レポート',
         to: '/chart',
       },
       {
@@ -69,10 +74,16 @@ export default defineComponent({
         to: '/option',
       },
     ]
-    const miniminiChenge = () => {
-      ctx.emit('miniminiC', !props.minimini)
+    const switchNavVarCall = () => {
+      ctx.emit('switch', !props.mini)
     }
-    return { items, miniminiChenge, office }
+    onBeforeMount(() => {
+      const useState = useGlobalState()
+      if (useState.userInfo.value.office) {
+        state.office = useState.userInfo.value.office
+      }
+    })
+    return { items, switchNavVarCall, ...toRefs(state) }
   },
 })
 </script>

@@ -3,22 +3,17 @@ import { config } from 'dotenv'
 import pg from 'pg'
 import {
   connectPathUsers,
-  connectPathRecordsManagement,
-  connectPathClients,
-  connectPathCosts,
-  connectPathSubjects,
-  connectPathSubjectsGroup,
+  connectPathPushRecordsManagement,
 } from '../composables/routing'
 import {
   Users,
   RecordsManagement,
   Clients,
   Costs,
-  Subjects,
-  SubjectsGroup,
-  getAllDataPostVal,
+  StateInterface,
+  Request,
 } from '../composables/interface'
-import { sqlText } from './sql'
+import { sql } from './sql'
 
 const env = process.env
 const app = express()
@@ -34,82 +29,161 @@ config()
 app.listen(8083, () => console.log('API Mock Server is running'))
 app.use(express.json())
 
-app.post(connectPathUsers, async (req, res) => {
+// 初期処理
+app.post(connectPathUsers, async (req: Request, res) => {
+  // 状態
   const client = await pool.connect()
+  const input: StateInterface = {
+    // ユーザ情報
+    userInfo: {
+      id: '',
+      office: '',
+    },
+
+    // 取引管理
+    userRecordsManagement: [
+      {
+        id: '',
+        payflg: 0,
+        pay: 0,
+        subject: '',
+        subjectGroup: '',
+        day: '',
+        clientOrCostName: '',
+        note: '',
+        month: '',
+      },
+    ],
+
+    // 勘定科目
+    subjectsInfo: [
+      {
+        id: '',
+        name: '',
+        groupname: '',
+        requireflg: 0,
+        sortid: 0,
+      },
+    ],
+    // 取引先および固定経費
+    clientsAndCostsInfo: [
+      {
+        id: '',
+        name: '',
+        itemFlg: 0,
+      },
+    ],
+    // 現在の会計期間
+    currentSysYear: { num: 0 },
+
+    // タブ情報
+    tabsInfo: [{ tab: '', content: '' }],
+  }
   try {
-    const sqll = `select * from users
-    where auth_id = '${req.body.key as string}'`
-    client.query(sqll, (err, result) => {
-      if (!err) {
-        console.log(result.rows[0])
-        res.json(result.rows[0])
-      }
-    })
+    // ユーザ情報取得
+    await client
+      .query(sql.userInfo.query, [req.body.key])
+      .then((result) => {
+        input.userInfo = result.rows[0]
+        // console.log('userInfo', input.userInfo)
+      })
+      .catch((e) => {
+        throw e
+      })
+
+    // 取引管理情報取得
+    await client
+      .query(sql.userRecordsManagement.query, [
+        input.userInfo.id,
+        new Date().getFullYear() - 1 + '-01-01',
+        new Date().getFullYear() - 1 + '-12-31',
+      ])
+      .then((result) => {
+        input.userRecordsManagement = result.rows
+        // console.log('userRecordsManagement', input.userRecordsManagement)
+      })
+      .catch((e) => {
+        throw e
+      })
+
+    // 勘定科目一覧取得
+    await client
+      .query(sql.subjectsInfo.query)
+      .then((result) => {
+        input.subjectsInfo = result.rows
+        // console.log('subjectsInfo', input.subjectsInfo)
+      })
+      .catch((e) => {
+        throw e
+      })
+
+    // ユーザ情報取得
+    await client
+      .query(sql.clientsAndCostsInfo.query, [input.userInfo.id])
+      .then((result) => {
+        input.clientsAndCostsInfo = result.rows
+        // console.log('userInfo', input.userInfo)
+      })
+      .catch((e) => {
+        throw e
+      })
+
+    // タブ情報取得
+    await client
+      .query(sql.tabsInfo.query)
+      .then((result) => {
+        input.tabsInfo = result.rows
+        // console.log('subjectsInfo', input.subjectsInfo)
+      })
+      .catch((e) => {
+        throw e
+      })
+
+    // console.log('Total', input)
+    res.json(input)
   } catch (e) {
     console.log(e)
-    return {}
+    res.json(null)
   } finally {
     if (client) client.release()
   }
-
-  // const reqVal = sqlText.filter((sqlText) =>
-  //   sqlText.name.match(req.body.key.table as string)
-  // )
-  // res.json(await sql(reqVal[0], [req.body.key.id as string]))
 })
 
-const sql = async (reqVal: getAllDataPostVal, prm: string[]) => {
+/// 取引管理テーブル 追加
+app.post(connectPathPushRecordsManagement, async (req, res) => {
   const client = await pool.connect()
+  const uid: string = req.body.key.id
+  const input: RecordsManagement = req.body.key.aryData
+
+  console.log(uid)
+  console.log(input)
+
   try {
-    const val = (await client.query(reqVal.query, prm)).rows
-    if (val && val.length > 0) {
-      if (reqVal.table === 'Users') {
-        console.log(val)
-        return val as Users[]
-      } else if (reqVal.table === 'RecordsManagement') {
-        return val as RecordsManagement[]
-      } else if (reqVal.table === 'Clients') {
-        return val as Clients[]
-      } else if (reqVal.table === 'Costs') {
-        return val as Costs[]
-      } else if (reqVal.table === 'Subjects') {
-        return val as Subjects[]
-      } else {
-        return val as SubjectsGroup[]
-      }
-    } else {
-      return {}
-    }
+    await client
+      .query(sql.insertRecordsManagement.query, [
+        input.id,
+        uid,
+        input.payflg,
+        input.pay,
+        input.subject,
+        input.day,
+        input.clientOrCostName,
+        input.note,
+      ])
+      .then(() => {
+        console.log('DB:insert complete')
+        res.json(true)
+        // console.log('userInfo', input.userInfo)
+      })
+      .catch((e) => {
+        throw e
+      })
   } catch (e) {
     console.log(e)
-    return {}
+    res.json(false)
   } finally {
     if (client) client.release()
   }
-}
-
-app.post('/testcopy', async (req, res) => {
-  console.log(`DB_HOST:${env.DB_HOST}`)
-
-  const resData = {}
-  console.log('========ここはIndex=======')
-  console.log(resData)
-  console.log('============================')
-  res.json(resData)
-  // res.json({ message: 'hello, api' })
-  // これはModelで！
-  // pool.connect((err, client) => {
-  //   if (err) {
-  //     console.log('接続できない')
-  //   } else {
-  //     console.log('接続できた')
-  //     client.query('SELECT mail FROM users', (err, result) => {
-  //       if (!err) {
-  //         res.json({ datas: result.rows })
-  //       }
-  //     })
-  //   }
-  // })
 })
 
 module.exports = {

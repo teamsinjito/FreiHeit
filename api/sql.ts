@@ -5,19 +5,15 @@ export const sql = {
   userRecordsManagement: {
     query: `select 
     rm.id,
+    rm.user_id as uid,
     rm.pay_flg as payflg,
     rm.value as pay,
-    s.name as subject,
-    sg.name as subject_group,
-    to_char(rm.register_date,'YYYY年MM月DD日') as day,
-    c.name as client_or_cost_name,
-    rm.note,
-    to_char(rm.register_date,'YYYYMM') as month
+    rm.subject_id as sid,
+    to_char(rm.register_date::timestamp with time zone, 'YYYY-MM-DD'::text) as day,
+    rm.client_or_cost_id as cid,
+    rm.note
     from records_managements as rm 
     inner join users as u on rm.user_id = u.id
-    left join subjects as s on rm.subject_id = s.id
-    left join subjects_groups as sg on sg.id = s.group_id
-    left join clients_and_costs as c on rm.client_or_cost_id = c.id
     where u.id = $1 and rm.register_date BETWEEN $2 AND $3
     order by rm.register_date desc`,
   },

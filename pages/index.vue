@@ -6,7 +6,7 @@
     class="overflow-hidden"
   >
     <!-- ヘッダー項目 -->
-    <header-bar></header-bar>
+    <index-header-bar></index-header-bar>
 
     <v-card flat rounded="0" class="mb-2">
       <!-- タブ項目一覧 -->
@@ -56,7 +56,14 @@
                       <v-icon @click="toggle"
                         >{{ isOpen ? 'mdi-chevron-up' : 'mdi-chevron-down' }}
                       </v-icon>
-                      {{ items[0].day }}
+                      {{
+                        items[0].day.slice(0, 4) +
+                        '年' +
+                        items[0].day.slice(5, 7) +
+                        '月' +
+                        items[0].day.slice(8, 10) +
+                        '日'
+                      }}
                     </th>
                   </template>
 
@@ -68,7 +75,7 @@
                         <span
                           class="font-weight-bold text-sm-caption"
                           style="font-size: 0.4rem"
-                          >勘定科目：{{ item.subject }}
+                          >勘定科目：{{ getSubjectName(item.sid) }}
                         </span>
                         <br />
                         <span
@@ -92,14 +99,17 @@
                           style="font-size: 0.4rem"
                           >{{ Number(item.pay).toLocaleString() }}
                         </span>
-                        <v-icon
+                        <!-- <v-icon
                           small
                           style="font-size: 0.4rem"
                           class="ml-sm-3 text-sm-caption font-weight-bold"
-                          @click="editItem(item)"
+                          @click="editItem(item.day)"
                         >
                           mdi-greater-than
-                        </v-icon>
+                        </v-icon> -->
+                        <update-cash-dialog
+                          :default-record="item"
+                        ></update-cash-dialog>
                       </th>
                     </tr>
                   </template>
@@ -170,9 +180,11 @@ import {
   toRefs,
   onBeforeMount,
 } from '@nuxtjs/composition-api'
+import UpdateCashDialog from '~/components/index/UpdateCashDialog.vue'
 import { useGlobalState } from '../composables/useDefault'
 
 export default defineComponent({
+  components: { UpdateCashDialog },
   setup() {
     const userState = useGlobalState()
     const state = reactive<{
@@ -198,10 +210,12 @@ export default defineComponent({
       { text: 'data', value: 'subject', align: 'start' },
       { text: 'money', value: 'pay', align: 'right' },
     ]
-
+    const getSubjectName = (m: string) => {
+      return userState.subjectsInfo.value.filter((s) => s.id === m)[0].name
+    }
     const filterItemWithMonth = (m: string) => {
-      return userState.userRecordsManagement.value.filter((record) =>
-        record.month.includes(m)
+      return userState.userRecordsManagement.value.filter((r) =>
+        (r.day.slice(0, 4) + r.day.slice(5, 7)).includes(m)
       )
     }
 
@@ -212,7 +226,7 @@ export default defineComponent({
         const a = filterItemWithMonth(m)
 
         // 要素ごとにフィルター
-        const f = a.filter((rec) => rec.subject.includes(element.name))
+        const f = a.filter((rec) => rec.sid.includes(element.id))
 
         // 要素の金額を全て合計する
         const sum = f.reduce((acc: number, record): number => {
@@ -224,9 +238,14 @@ export default defineComponent({
       return totals
     }
 
+    const editItem = (day: string) => {
+      console.log(day)
+    }
     return {
       ...toRefs(state),
       headers,
+      getSubjectName,
+      editItem,
       userState,
       filterItemWithMonth,
       filterAndMergeItemWithMonth,

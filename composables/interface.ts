@@ -9,14 +9,13 @@ export interface Users {
 // ユーザ毎の取引管理
 export interface RecordsManagement {
   id: string
+  uid: string
   payflg: number
   pay: number
-  subject: string
-  subjectGroup: string
+  sid: string
   day: string
-  clientOrCostName: string
+  cid: string
   note: string
-  month: string
 }
 
 // ユーザ毎の取引先および固定経費一覧

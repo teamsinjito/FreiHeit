@@ -6,7 +6,7 @@
     class="overflow-hidden"
   >
     <!-- ヘッダー項目 -->
-    <header-bar></header-bar>
+    <index-header-bar></index-header-bar>
     <v-divider></v-divider>
     <v-card flat rounded="0" class="mb-2 py-5">
       <v-card-text>

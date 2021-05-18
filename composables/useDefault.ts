@@ -35,14 +35,13 @@ const createGlobalState = (userId: string) => {
     userRecordsManagement: [
       {
         id: '',
+        uid: '',
         payflg: 0,
         pay: 0,
-        subject: '',
-        subjectGroup: '',
+        sid: '',
         day: '',
-        clientOrCostName: '',
+        cid: '',
         note: '',
-        month: '',
       },
     ],
 
@@ -101,29 +100,20 @@ const createGlobalState = (userId: string) => {
     ary.id = uuidv4()
 
     // DB 追加用
-    const insertAry = JSON.parse(JSON.stringify(ary))
-    insertAry.subject = globalState.subjectsInfo.filter((el) =>
-      el.name.includes(ary.subject)
-    )[0].id
-    insertAry.clientOrCostName = globalState.clientsAndCostsInfo.filter((el) =>
-      el.name.includes(ary.clientOrCostName)
-    )[0].id
+    // const insertAry = JSON.parse(JSON.stringify(ary))
+    // insertAry.subject = globalState.subjectsInfo.filter((el) =>
+    //   el.name.includes(ary.subject)
+    // )[0].id
+    // insertAry.clientOrCostName = globalState.clientsAndCostsInfo.filter((el) =>
+    //   el.name.includes(ary.clientcost)
+    // )[0].id
 
     await axios
       .post<StateInterface>(`/api${connectPathPushRecordsManagement}`, {
-        key: { id: globalState.userInfo.id, aryData: insertAry },
+        key: ary,
       })
       .then((res) => {
         if (res.data) {
-          // 日付のフォーマット変換
-          ary.day =
-            ary.day.slice(0, 4) +
-            '年' +
-            ary.day.slice(5, 7) +
-            '月' +
-            ary.day.slice(8, 10) +
-            '日'
-
           globalState.userRecordsManagement.push(ary)
           // ソート
           globalState.userRecordsManagement.sort((n1, n2) => {

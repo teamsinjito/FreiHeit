@@ -27,19 +27,15 @@
           <v-container>
             <v-row>
               <v-col cols="5" sm="4">
-                <v-switch
-                  v-model="paySwitch"
-                  color="success"
-                  @change="setPayFlg()"
-                >
+                <v-switch color="success" @change="setPayFlg()">
                   <template #label>
                     <span
-                      v-if="paySwitch == true"
-                      class="success--text font-weight-bold"
-                      >収入</span
-                    >
-                    <span v-else class="font-weight-bold error--text"
+                      v-if="payflg == -1"
+                      class="error--text font-weight-bold"
                       >支出</span
+                    >
+                    <span v-else class="font-weight-bold success--text"
+                      >収入</span
                     >
                   </template>
                 </v-switch>
@@ -61,12 +57,11 @@
                 <v-autocomplete
                   v-model="inputSubject"
                   :items="userState.subjectsInfo.value"
-                  item-value="name"
+                  item-value="id"
                   item-text="name"
                   label="勘定科目"
                   :rules="nameRules"
                   required
-                  @change="matchInputSubjectGroup()"
                 ></v-autocomplete>
               </v-col>
               <v-col cols="12" sm="6">
@@ -81,12 +76,12 @@
               <v-col cols="12">
                 <v-autocomplete
                   v-model="inputClientAndCost"
-                  item-value="name"
+                  item-value="id"
                   item-text="name"
                   :items="userState.clientsAndCostsInfo.value"
                   label="取引先/固定経費"
                   :rules="nameRules"
-                  @change="matchInputNote()"
+                  @change="matchInputNote(inputClientAndCost)"
                 ></v-autocomplete>
               </v-col>
               <v-col cols="12">
@@ -148,8 +143,7 @@ export default defineComponent({
     ]
     const state = reactive<{
       valid: boolean
-      payFlg: number
-      paySwitch: boolean
+      payflg: number
       dialog: boolean
       checkbox: boolean
       inputPay: number
@@ -161,8 +155,7 @@ export default defineComponent({
       inputNote: string
     }>({
       valid: false,
-      payFlg: 1,
-      paySwitch: true,
+      payflg: -1,
       dialog: false,
       checkbox: true,
       inputDate: '',
@@ -180,20 +173,16 @@ export default defineComponent({
     }
 
     // 摘要および取引先、固定経費の同期
-    const matchInputNote = () => {
-      state.inputNote = state.inputClientAndCost
+    const matchInputNote = (m: string) => {
+      state.inputNote = userState.clientsAndCostsInfo.value.filter(
+        (c) => c.id === m
+      )[0].name
     }
 
     // 収支フラグ取得
     const setPayFlg = () => {
-      state.paySwitch ? (state.payFlg = 1) : (state.payFlg = -1)
-    }
-
-    // 勘定科目グループ取得
-    const matchInputSubjectGroup = () => {
-      state.inputSubjectGroup = userState.subjectsInfo.value.filter((el) =>
-        el.name.includes(state.inputSubject)
-      )[0].groupname
+      state.payflg = state.payflg * -1
+      console.log(state.payflg)
     }
 
     // 取引管理追加
@@ -208,20 +197,18 @@ export default defineComponent({
 
       userState.insertRecordManagement({
         id: '',
-        payflg: state.payFlg,
+        uid: userState.userInfo.value.id,
+        payflg: state.payflg,
         pay: state.inputPay,
-        subject: state.inputSubject,
-        subjectGroup: state.inputSubjectGroup,
+        sid: state.inputSubject,
         day: state.inputDate,
-        clientOrCostName: state.inputClientAndCost,
+        cid: state.inputClientAndCost,
         note: state.inputNote,
-        month: state.inputDate.slice(0, 4) + state.inputDate.slice(5, 7),
       })
     }
     return {
       form,
       setPayFlg,
-      matchInputSubjectGroup,
       nameRules,
       dayRules,
       payRules,

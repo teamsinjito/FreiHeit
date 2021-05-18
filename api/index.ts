@@ -44,14 +44,13 @@ app.post(connectPathUsers, async (req: Request, res) => {
     userRecordsManagement: [
       {
         id: '',
+        uid: '',
         payflg: 0,
         pay: 0,
-        subject: '',
-        subjectGroup: '',
+        sid: '',
         day: '',
-        clientOrCostName: '',
+        cid: '',
         note: '',
-        month: '',
       },
     ],
 
@@ -152,22 +151,20 @@ app.post(connectPathUsers, async (req: Request, res) => {
 /// 取引管理テーブル 追加
 app.post(connectPathPushRecordsManagement, async (req, res) => {
   const client = await pool.connect()
-  const uid: string = req.body.key.id
-  const input: RecordsManagement = req.body.key.aryData
+  const input: RecordsManagement = req.body.key
 
-  console.log(uid)
   console.log(input)
 
   try {
     await client
       .query(sql.insertRecordsManagement.query, [
         input.id,
-        uid,
+        input.uid,
         input.payflg,
         input.pay,
-        input.subject,
+        input.sid,
         input.day,
-        input.clientOrCostName,
+        input.cid,
         input.note,
       ])
       .then(() => {

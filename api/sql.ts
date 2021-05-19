@@ -6,7 +6,6 @@ export const sql = {
     query: `select 
     rm.id,
     rm.user_id as uid,
-    rm.pay_flg as payflg,
     rm.value as pay,
     rm.subject_id as sid,
     to_char(rm.register_date::timestamp with time zone, 'YYYY-MM-DD'::text) as day,
@@ -32,13 +31,24 @@ export const sql = {
     query: `insert into records_managements(
       id,
       user_id,
-      pay_flg,
       value,
       subject_id,
       register_date,
       client_or_cost_id,
       note
     ) 
-    values($1,$2,$3,$4,$5,$6,$7,$8);`,
+    values($1,$2,$3,$4,$5,$6,$7);`,
+  },
+  existCheckRecordManagement: {
+    query: 'select count(id) from records_managements where id = $1 ;',
+  },
+  updateRecprdManagement: {
+    query: `update records_managements set 
+              value = $1,
+              subject_id = $2,
+              register_date = $3,
+              client_or_cost_id = $4,
+              note = $5
+            where id = $6 ;`,
   },
 }

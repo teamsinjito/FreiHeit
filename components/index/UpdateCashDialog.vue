@@ -35,16 +35,33 @@ export default defineComponent({
       required: true,
     },
   },
-  setup(props: { defaultRecord: RecordsManagement }) {
+  setup(props, context) {
+    const useState = useGlobalState()
     const state = reactive<{
       dialog: boolean
+      snackbar: boolean
+      snackBarTxt: string
+      color: string
     }>({
       dialog: false,
+      snackbar: false,
+      snackBarTxt: '',
+      color: '',
     })
     const dialogOpenClose = (v: boolean) => {
       state.dialog = v
     }
-    const updateCash = () => {}
+    const updateCash = (record: RecordsManagement, v: boolean) => {
+      state.dialog = v
+      useState
+        .updateRecordManagement(record)
+        .then(() => {
+          context.emit('complete', '取引の更新が正常に完了しました。', '', true)
+        })
+        .catch(() => {
+          context.emit('complete', '取引の更新に失敗しました', '', true)
+        })
+    }
 
     return {
       ...toRefs(state),

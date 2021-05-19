@@ -10,7 +10,6 @@ export interface Users {
 export interface RecordsManagement {
   id: string
   uid: string
-  payflg: number
   pay: number
   sid: string
   day: string

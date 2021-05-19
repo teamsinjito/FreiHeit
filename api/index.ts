@@ -3,10 +3,10 @@ import { config } from 'dotenv'
 import pg from 'pg'
 import {
   connectPathUsers,
-  connectPathPushRecordsManagement,
+  connectPathInsertRecordsManagement,
+  connectPathUpdateRecordsManagement,
 } from '../composables/routing'
 import {
-  Users,
   RecordsManagement,
   Clients,
   Costs,
@@ -45,7 +45,6 @@ app.post(connectPathUsers, async (req: Request, res) => {
       {
         id: '',
         uid: '',
-        payflg: 0,
         pay: 0,
         sid: '',
         day: '',
@@ -149,7 +148,7 @@ app.post(connectPathUsers, async (req: Request, res) => {
 })
 
 /// 取引管理テーブル 追加
-app.post(connectPathPushRecordsManagement, async (req, res) => {
+app.post(connectPathInsertRecordsManagement, async (req, res) => {
   const client = await pool.connect()
   const input: RecordsManagement = req.body.key
 
@@ -160,7 +159,6 @@ app.post(connectPathPushRecordsManagement, async (req, res) => {
       .query(sql.insertRecordsManagement.query, [
         input.id,
         input.uid,
-        input.payflg,
         input.pay,
         input.sid,
         input.day,
@@ -171,6 +169,39 @@ app.post(connectPathPushRecordsManagement, async (req, res) => {
         console.log('DB:insert complete')
         res.json(true)
         // console.log('userInfo', input.userInfo)
+      })
+      .catch((e) => {
+        throw e
+      })
+  } catch (e) {
+    console.log(e)
+    res.json(false)
+  } finally {
+    if (client) client.release()
+  }
+})
+
+/// 取引管理テーブル 更新
+app.post(connectPathUpdateRecordsManagement, async (req, res) => {
+  const client = await pool.connect()
+  const input: RecordsManagement = req.body.key
+
+  console.log(input)
+
+  try {
+    // 取引管理テーブル更新
+    await client
+      .query(sql.updateRecprdManagement.query, [
+        input.pay,
+        input.sid,
+        input.day,
+        input.cid,
+        input.note,
+        input.id,
+      ])
+      .then(() => {
+        console.log('DB:update complete')
+        res.json(true)
       })
       .catch((e) => {
         throw e

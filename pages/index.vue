@@ -6,7 +6,7 @@
     class="overflow-hidden"
   >
     <!-- ヘッダー項目 -->
-    <index-header-bar></index-header-bar>
+    <index-header-bar @complete="showMessage"></index-header-bar>
 
     <v-card flat rounded="0" class="mb-2">
       <!-- タブ項目一覧 -->
@@ -87,28 +87,13 @@
                       <!-- 金額,編集アイコン -->
                       <th class="text-right pl-0">
                         <span
-                          v-if="item.payflg == 1"
-                          color="info"
-                          class="success--text text-sm-caption font-weight-bold"
+                          class="text-sm-caption font-weight-bold"
                           style="font-size: 0.4rem"
-                          >{{ Number(item.pay).toLocaleString() }}
+                          >{{ Number(item.pay).toLocaleString() }} 円
                         </span>
-                        <span
-                          v-else
-                          class="error--text text-sm-caption font-weight-bold"
-                          style="font-size: 0.4rem"
-                          >{{ Number(item.pay).toLocaleString() }}
-                        </span>
-                        <!-- <v-icon
-                          small
-                          style="font-size: 0.4rem"
-                          class="ml-sm-3 text-sm-caption font-weight-bold"
-                          @click="editItem(item.day)"
-                        >
-                          mdi-greater-than
-                        </v-icon> -->
                         <update-cash-dialog
                           :default-record="item"
+                          @complete="showMessage"
                         ></update-cash-dialog>
                       </th>
                     </tr>
@@ -156,7 +141,7 @@
                               >{{ total.name }}:</v-list-item-content
                             >
                             <v-list-item-content class="align-end">
-                              {{ total.pay.toLocaleString() }}
+                              {{ total.pay.toLocaleString() }} 円
                             </v-list-item-content>
                           </v-list-item>
                         </v-col>
@@ -170,6 +155,9 @@
         </v-tab-item>
       </v-tabs-items>
     </v-card>
+    <v-snackbar v-model="snack.view" timeout="2000" :color="snack.color"
+      >{{ snack.text }}
+    </v-snackbar>
   </v-sheet>
 </template>
 
@@ -196,6 +184,11 @@ export default defineComponent({
           pay: number
         }
       ]
+      snack: {
+        text: string
+        color: string
+        view: boolean
+      }
     }>({
       tab: '',
       singleExpand: true,
@@ -205,6 +198,11 @@ export default defineComponent({
           pay: 0,
         },
       ],
+      snack: {
+        text: '',
+        color: '',
+        view: false,
+      },
     })
     const headers = [
       { text: 'data', value: 'subject', align: 'start' },
@@ -238,17 +236,21 @@ export default defineComponent({
       return totals
     }
 
-    const editItem = (day: string) => {
-      console.log(day)
+    const showMessage = (text: string, color: string, view: boolean) => {
+      console.log(text)
+      state.snack.text = text
+      state.snack.color = color
+      state.snack.view = view
     }
+
     return {
       ...toRefs(state),
       headers,
       getSubjectName,
-      editItem,
       userState,
       filterItemWithMonth,
       filterAndMergeItemWithMonth,
+      showMessage,
     }
   },
 })

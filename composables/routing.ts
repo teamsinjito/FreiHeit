@@ -1,2 +1,3 @@
 export const connectPathUsers = '/getAllDataUsers'
-export const connectPathPushRecordsManagement = '/pushRecordsManagement'
+export const connectPathInsertRecordsManagement = '/insertRecordsManagement'
+export const connectPathUpdateRecordsManagement = '/updateRecordsManagement'

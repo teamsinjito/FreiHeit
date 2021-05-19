@@ -10,17 +10,10 @@ import axios from 'axios'
 import { v4 as uuidv4 } from 'uuid'
 import {
   connectPathUsers,
-  connectPathPushRecordsManagement,
+  connectPathInsertRecordsManagement,
+  connectPathUpdateRecordsManagement,
 } from '../composables/routing'
-import {
-  Users,
-  RecordsManagement,
-  Clients,
-  Costs,
-  Subjects,
-  SubjectsGroup,
-  StateInterface,
-} from '../composables/interface'
+import { RecordsManagement, StateInterface } from '../composables/interface'
 
 const createGlobalState = (userId: string) => {
   // 状態
@@ -36,7 +29,6 @@ const createGlobalState = (userId: string) => {
       {
         id: '',
         uid: '',
-        payflg: 0,
         pay: 0,
         sid: '',
         day: '',
@@ -98,18 +90,8 @@ const createGlobalState = (userId: string) => {
   const insertRecordManagement = async (ary: RecordsManagement) => {
     // uuid生成
     ary.id = uuidv4()
-
-    // DB 追加用
-    // const insertAry = JSON.parse(JSON.stringify(ary))
-    // insertAry.subject = globalState.subjectsInfo.filter((el) =>
-    //   el.name.includes(ary.subject)
-    // )[0].id
-    // insertAry.clientOrCostName = globalState.clientsAndCostsInfo.filter((el) =>
-    //   el.name.includes(ary.clientcost)
-    // )[0].id
-
     await axios
-      .post<StateInterface>(`/api${connectPathPushRecordsManagement}`, {
+      .post<StateInterface>(`/api${connectPathInsertRecordsManagement}`, {
         key: ary,
       })
       .then((res) => {
@@ -134,6 +116,43 @@ const createGlobalState = (userId: string) => {
         alert('取引の登録に失敗しました。')
       })
   }
+
+  // 取引管理更新
+  const updateRecordManagement = async (ary: RecordsManagement) => {
+    await axios
+      .post<StateInterface>(`/api${connectPathUpdateRecordsManagement}`, {
+        key: ary,
+      })
+      .then((res) => {
+        if (res.data) {
+          const row = globalState.userRecordsManagement.filter(
+            (r) => r.id === ary.id
+          )[0]
+          row.pay = ary.pay
+          row.sid = ary.sid
+          row.day = ary.day
+          row.cid = ary.cid
+          row.note = ary.note
+
+          // ソート
+          globalState.userRecordsManagement.sort((n1, n2) => {
+            if (n1.day > n2.day) {
+              return -1
+            }
+            if (n1.day < n2.day) {
+              return 1
+            }
+            return 0
+          })
+          console.log('取引更新：成功!')
+        } else {
+          alert('取引の更新に失敗しました。')
+        }
+      })
+      .catch(() => {
+        alert('取引の更新に失敗しました。')
+      })
+  }
   onMounted(() => {
     setGrobalStateCall(userId)
 
@@ -149,6 +168,7 @@ const createGlobalState = (userId: string) => {
     ...toRefs(globalState),
     setGrobalStateCall,
     insertRecordManagement,
+    updateRecordManagement,
   }
 }
 

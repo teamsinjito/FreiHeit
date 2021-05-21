@@ -20,7 +20,7 @@
         <v-row class="my-5">
           <v-col cols="12" class="text-center">
             <v-btn rounded color="primary" dark @click="loginWithAuthZero">
-              ログイン画面へ
+              ログイン
             </v-btn>
           </v-col>
         </v-row>

@@ -12,23 +12,34 @@ import {
   connectPathUsers,
   connectPathInsertRecordsManagement,
   connectPathUpdateRecordsManagement,
+  connectPathDeleteRecordsManagement,
+  connectPathInsertClientCost,
+  connectPathUpdateClientCost,
+  connectPathDeleteClientCost,
+  connectPathChangeYearRecordsManagement,
 } from '../composables/routing'
-import { RecordsManagement, StateInterface } from '../composables/interface'
+import {
+  RecordsManagement,
+  StateInterface,
+  ClientsAndCosts,
+} from '../composables/interface'
 
 const createGlobalState = (userId: string) => {
   // 状態
   const globalState = reactive<StateInterface>({
     // ユーザ情報
-    userInfo: {
-      id: '',
-      office: '',
-    },
-
-    // 取引管理
-    userRecordsManagement: [
+    workInfo: [
       {
         id: '',
-        uid: '',
+        name: '',
+      },
+    ],
+
+    // 取引管理
+    workRecordsManagement: [
+      {
+        id: '',
+        wid: '',
         pay: 0,
         sid: '',
         day: '',
@@ -53,7 +64,8 @@ const createGlobalState = (userId: string) => {
       {
         id: '',
         name: '',
-        itemFlg: 0,
+        wid: '',
+        iflg: 0,
       },
     ],
     // 現在の会計年度
@@ -61,6 +73,13 @@ const createGlobalState = (userId: string) => {
 
     // タブ情報
     tabsInfo: [{ tab: '', content: '' }],
+
+    // スナックバー情報
+    snackInfo: {
+      text: '',
+      color: '',
+      view: false,
+    },
   })
 
   // グローバルstateにセット
@@ -71,8 +90,8 @@ const createGlobalState = (userId: string) => {
       })
       .then((data) => {
         if (data.data != null) {
-          globalState.userInfo = data.data.userInfo
-          globalState.userRecordsManagement = data.data.userRecordsManagement
+          globalState.workInfo = data.data.workInfo
+          globalState.workRecordsManagement = data.data.workRecordsManagement
           globalState.subjectsInfo = data.data.subjectsInfo
           globalState.clientsAndCostsInfo = data.data.clientsAndCostsInfo
           globalState.tabsInfo = data.data.tabsInfo
@@ -96,9 +115,9 @@ const createGlobalState = (userId: string) => {
       })
       .then((res) => {
         if (res.data) {
-          globalState.userRecordsManagement.push(ary)
+          globalState.workRecordsManagement.push(ary)
           // ソート
-          globalState.userRecordsManagement.sort((n1, n2) => {
+          globalState.workRecordsManagement.sort((n1, n2) => {
             if (n1.day > n2.day) {
               return -1
             }
@@ -108,12 +127,13 @@ const createGlobalState = (userId: string) => {
             return 0
           })
           console.log('取引追加：成功!')
+          snackBarDisplay('取引の登録が正常に完了しました。', '')
         } else {
-          alert('取引の登録に失敗しました。')
+          snackBarDisplay('取引の登録が失敗しました。', 'error')
         }
       })
       .catch(() => {
-        alert('取引の登録に失敗しました。')
+        snackBarDisplay('取引の登録が失敗しました。', 'error')
       })
   }
 
@@ -125,7 +145,7 @@ const createGlobalState = (userId: string) => {
       })
       .then((res) => {
         if (res.data) {
-          const row = globalState.userRecordsManagement.filter(
+          const row = globalState.workRecordsManagement.filter(
             (r) => r.id === ary.id
           )[0]
           row.pay = ary.pay
@@ -135,7 +155,7 @@ const createGlobalState = (userId: string) => {
           row.note = ary.note
 
           // ソート
-          globalState.userRecordsManagement.sort((n1, n2) => {
+          globalState.workRecordsManagement.sort((n1, n2) => {
             if (n1.day > n2.day) {
               return -1
             }
@@ -145,14 +165,108 @@ const createGlobalState = (userId: string) => {
             return 0
           })
           console.log('取引更新：成功!')
+          snackBarDisplay('取引の更新が正常に完了しました。', '')
         } else {
-          alert('取引の更新に失敗しました。')
+          snackBarDisplay('取引の更新が失敗しました。', 'error')
         }
       })
       .catch(() => {
-        alert('取引の更新に失敗しました。')
+        snackBarDisplay('取引の更新が失敗しました。', 'error')
       })
   }
+  // 取引管理削除
+  const deleteRecordManagement = async (id: string) => {
+    await axios
+      .post(`/api${connectPathDeleteRecordsManagement}`, {
+        key: id,
+      })
+      .then((res) => {
+        if (res.data) {
+          globalState.workRecordsManagement = globalState.workRecordsManagement.filter(
+            (r) => r.id !== id
+          )
+
+          console.log('取引削除：成功!')
+          snackBarDisplay('取引の削除が正常に完了しました。', '')
+        } else {
+          snackBarDisplay('取引の削除が失敗しました。', 'error')
+        }
+      })
+      .catch(() => {
+        snackBarDisplay('取引の削除が失敗しました。', 'error')
+      })
+  }
+
+  // 取引先もしくは固定経費追加
+  const insertClientCost = async (ary: ClientsAndCosts) => {
+    // uuid生成
+    ary.id = uuidv4()
+    await axios
+      .post<ClientsAndCosts>(`/api${connectPathInsertClientCost}`, {
+        key: ary,
+      })
+      .then((res) => {
+        if (res.data) {
+          globalState.clientsAndCostsInfo.push(ary)
+          console.log(globalState.clientsAndCostsInfo)
+          // if (ary.iflg === 1) {
+          //   console.log('取引先追加：成功!')
+          //   snackBarDisplay('取引先の登録が正常に完了しました。', '')
+          // } else {
+          //   console.log('固定経費追加：成功!')
+          //   snackBarDisplay('固定経費の登録が正常に完了しました。', '')
+          // }
+        }
+      })
+      .catch(() => {
+        if (ary.iflg === 1) {
+          console.log('取引先追加：成功!')
+          snackBarDisplay('取引先の登録が正常に完了しました。', '')
+        } else {
+          console.log('固定経費追加：成功!')
+          snackBarDisplay('固定経費の登録が正常に完了しました。', '')
+        }
+      })
+  }
+  // 年度切り替え
+  const changeYearRecordsManagement = async (year: number) => {
+    await axios
+      .post<RecordsManagement[]>(
+        `/api${connectPathChangeYearRecordsManagement}`,
+        {
+          key: { id: globalState.workInfo[0].id, y: year },
+        }
+      )
+      .then((res) => {
+        globalState.workRecordsManagement = res.data
+        // ソート
+        globalState.workRecordsManagement.sort((n1, n2) => {
+          if (n1.day > n2.day) {
+            return -1
+          }
+          if (n1.day < n2.day) {
+            return 1
+          }
+          return 0
+        })
+
+        snackBarDisplay('会計期間を' + year + '年度に切り替えました。', '')
+      })
+      .catch(() => {
+        snackBarDisplay(
+          '会計期間を' + year + '年度に切り替えできませんでした。',
+          'error'
+        )
+      })
+  }
+
+  // スナックバー表示
+  const snackBarDisplay = (message: string, color: string) => {
+    globalState.snackInfo.text = message
+    globalState.snackInfo.color = color
+    globalState.snackInfo.view = !globalState.snackInfo.view
+  }
+
   onMounted(() => {
     setGrobalStateCall(userId)
 
@@ -169,6 +283,10 @@ const createGlobalState = (userId: string) => {
     setGrobalStateCall,
     insertRecordManagement,
     updateRecordManagement,
+    deleteRecordManagement,
+    insertClientCost,
+    changeYearRecordsManagement,
+    snackBarDisplay,
   }
 }
 

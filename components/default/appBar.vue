@@ -23,7 +23,7 @@
               <v-icon>mdi-calendar-month</v-icon>
             </v-list-item-icon>
             <v-list-item-content>
-              <v-list-item-title>
+              <v-list-item-title style="width: 170px">
                 <v-select
                   v-model="userState.currentSysYear.value.num"
                   label="会計期間"
@@ -31,6 +31,7 @@
                   item-text="num"
                   :items="yearList"
                   suffix="年度"
+                  style="font-size: 0.9rem"
                   @change="changeCarrentYear()"
                 ></v-select
               ></v-list-item-title>
@@ -43,7 +44,9 @@
               /></v-avatar>
             </v-list-item-icon>
             <v-list-item-content>
-              <v-list-item-title>{{ authUser.name }}</v-list-item-title>
+              <v-list-item-title style="font-size: 0.9rem">{{
+                authUser.name
+              }}</v-list-item-title>
             </v-list-item-content>
           </v-list-item>
           <v-list-item>
@@ -51,7 +54,9 @@
               <v-icon>mdi-logout-variant</v-icon>
             </v-list-item-icon>
             <v-list-item-content>
-              <v-list-item-title @click="logoutWithAuth0"
+              <v-list-item-title
+                style="font-size: 0.9rem"
+                @click="logoutWithAuth0"
                 >ログアウト</v-list-item-title
               >
             </v-list-item-content>
@@ -67,7 +72,6 @@ import {
   reactive,
   onBeforeMount,
   toRefs,
-  Ref,
 } from '@vue/composition-api'
 import { useGlobalState } from '../../composables/useDefault'
 export default defineComponent({
@@ -83,16 +87,33 @@ export default defineComponent({
         name: string
         pic: string
       }
+      snack: {
+        text: string
+        color: string
+        view: boolean
+      }
     }>({
       authUser: {
         name: '名無し',
         pic: 'mdi-account-settings',
+      },
+      snack: {
+        text: '',
+        color: '',
+        view: false,
       },
     })
     const userState = useGlobalState()
     const preYear = new Date().getFullYear() - 1
     const title = 'FreiHeit'
     const yearList = [
+      { num: 2013 },
+      { num: 2014 },
+      { num: 2015 },
+      { num: 2016 },
+      { num: 2017 },
+      { num: 2018 },
+      { num: 2019 },
       { num: 2020 },
       { num: 2021 },
       { num: 2022 },
@@ -112,7 +133,7 @@ export default defineComponent({
     })
 
     const changeCarrentYear = () => {
-      console.log(userState.currentSysYear.value.num + '年度に切り替え')
+      userState.changeYearRecordsManagement(userState.currentSysYear.value.num)
     }
     const switchNavVarCall = () => {
       context.emit('switch', !props.mini)

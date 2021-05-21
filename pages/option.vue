@@ -25,99 +25,39 @@
                     <v-divider class="mx-4" inset vertical></v-divider>
                     <v-spacer></v-spacer>
                     <!-- 取引先追加ボタン ダイアログ -->
-                    <v-dialog v-model="dialog" max-width="500px">
-                      <template #activator="{ on, attrs }">
-                        <v-btn
-                          color="primary"
-                          dark
-                          class="text-sm-button text-caption"
-                          v-bind="attrs"
-                          v-on="on"
-                        >
-                          New
-                        </v-btn>
-                      </template>
-                      <v-card>
-                        <v-toolbar color="primary" flat>
-                          <v-card-title>
-                            <span
-                              class="white--text text-subtitle-1 font-weight-black"
-                              >取引先追加</span
-                            >
-                          </v-card-title>
-                        </v-toolbar>
-                        <v-card-text>
-                          <v-container class="my-3">
-                            <v-card-subtitle class="px-0 mb-4"
-                              >取引先名称を入力してください</v-card-subtitle
-                            >
-                            <v-row>
-                              <v-text-field required></v-text-field></v-row
-                          ></v-container>
-                          <small>
-                            <v-checkbox v-model="checkbox">
-                              <template #label>
-                                <span class="text-caption font-weight-bold"
-                                  >連続して取引先を登録する</span
-                                >
-                              </template>
-                            </v-checkbox></small
-                          >
-                        </v-card-text>
-                        <v-card-actions>
-                          <v-spacer></v-spacer>
-                          <v-btn
-                            color="blue darken-1"
-                            text
-                            @click="dialog = false"
-                          >
-                            キャンセル
-                          </v-btn>
-                          <v-btn
-                            color="blue darken-1"
-                            text
-                            @click="dialog = false"
-                          >
-                            保存
-                          </v-btn>
-                        </v-card-actions>
-                      </v-card>
-                    </v-dialog>
+                    <add-client-cost
+                      title="取引先追加"
+                      subtitle="取引先名称を入力してください"
+                      iflg="1"
+                    ></add-client-cost>
                   </v-toolbar>
                   <v-divider></v-divider>
                   <!-- テーブル -->
-                  <v-simple-table fixed-header height="40vh">
-                    <template #default>
-                      <tbody>
-                        <tr>
-                          <td class="text-caption">AA社</td>
-                          <td class="text-right">
-                            <v-icon
-                              small
-                              style="font-size: 0.4rem"
-                              class="ml-sm-3 text-sm-caption font-weight-bold"
-                              @click="editItem(item)"
-                            >
-                              mdi-greater-than
-                            </v-icon>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td class="text-caption">BB社</td>
-                          <td class="text-right">
-                            <v-icon
-                              small
-                              style="font-size: 0.4rem"
-                              class="ml-sm-3 text-sm-caption font-weight-bold"
-                              @click="editItem(item)"
-                            >
-                              mdi-greater-than
-                            </v-icon>
-                          </td>
-                        </tr>
-                      </tbody>
+                  <v-data-table
+                    fixed-header
+                    :items="filterClientOrCost(1)"
+                    height="40vh"
+                    :items-per-page="100"
+                    hide-default-header
+                    hide-default-footer
+                    style="overflow: auto; max-height: 40vh"
+                  >
+                    <template #[`item`]="{ item }">
+                      <tr>
+                        <th class="text-caption">
+                          {{ item.name }}
+                        </th>
+                        <th class="text-right">
+                          <update-client-cost
+                            title="取引先更新"
+                            subtitle="取引先名称を編集できます"
+                            iflg="1"
+                            :default-record="item"
+                          ></update-client-cost>
+                        </th>
+                      </tr>
                     </template>
-                  </v-simple-table>
+                  </v-data-table>
                 </v-expansion-panel-content>
               </v-expansion-panel>
             </v-expansion-panels>
@@ -136,99 +76,39 @@
                     <v-divider class="mx-4" inset vertical></v-divider>
                     <v-spacer></v-spacer>
                     <!-- 固定経費追加ボタン ダイアログ -->
-                    <v-dialog v-model="dialog" max-width="500px">
-                      <template #activator="{ on, attrs }">
-                        <v-btn
-                          color="primary"
-                          dark
-                          class="text-sm-button text-caption"
-                          v-bind="attrs"
-                          v-on="on"
-                        >
-                          New
-                        </v-btn>
-                      </template>
-                      <v-card>
-                        <v-toolbar color="primary" flat>
-                          <v-card-title>
-                            <span
-                              class="white--text text-subtitle-1 font-weight-black"
-                              >固定経費追加</span
-                            >
-                          </v-card-title>
-                        </v-toolbar>
-                        <v-card-text>
-                          <v-container class="my-3">
-                            <v-card-subtitle class="px-0 mb-4"
-                              >固定経費名称を入力してください</v-card-subtitle
-                            >
-                            <v-row>
-                              <v-text-field required></v-text-field></v-row
-                          ></v-container>
-                          <small>
-                            <v-checkbox v-model="checkbox">
-                              <template #label>
-                                <span class="text-caption font-weight-bold"
-                                  >連続して固定経費を登録する</span
-                                >
-                              </template>
-                            </v-checkbox></small
-                          >
-                        </v-card-text>
-                        <v-card-actions>
-                          <v-spacer></v-spacer>
-                          <v-btn
-                            color="blue darken-1"
-                            text
-                            @click="dialog = false"
-                          >
-                            キャンセル
-                          </v-btn>
-                          <v-btn
-                            color="blue darken-1"
-                            text
-                            @click="dialog = false"
-                          >
-                            保存
-                          </v-btn>
-                        </v-card-actions>
-                      </v-card>
-                    </v-dialog>
+                    <add-client-cost
+                      title="固定経費追加"
+                      subtitle="固定経費を入力してください"
+                      iflg="2"
+                    ></add-client-cost>
                   </v-toolbar>
                   <v-divider></v-divider>
                   <!-- テーブル -->
-                  <v-simple-table height="40vh">
-                    <template #default>
-                      <tbody>
-                        <tr>
-                          <td class="text-caption">コインパーキング・高速</td>
-                          <td class="text-right">
-                            <v-icon
-                              small
-                              style="font-size: 0.4rem"
-                              class="ml-sm-3 text-sm-caption font-weight-bold"
-                              @click="editItem(item)"
-                            >
-                              mdi-greater-than
-                            </v-icon>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td class="text-caption">インターネット</td>
-                          <td class="text-right">
-                            <v-icon
-                              small
-                              style="font-size: 0.4rem"
-                              class="ml-sm-3 text-sm-caption font-weight-bold"
-                              @click="editItem(item)"
-                            >
-                              mdi-greater-than
-                            </v-icon>
-                          </td>
-                        </tr>
-                      </tbody>
+                  <v-data-table
+                    fixed-header
+                    :items="filterClientOrCost(2)"
+                    height="40vh"
+                    :items-per-page="100"
+                    hide-default-header
+                    hide-default-footer
+                    style="overflow: auto; max-height: 40vh"
+                  >
+                    <template #[`item`]="{ item }">
+                      <tr>
+                        <th class="text-caption">
+                          {{ item.name }}
+                        </th>
+                        <th class="text-right">
+                          <update-client-cost
+                            title="固定経費更新"
+                            subtitle="固定経費名称を編集できます"
+                            iflg="2"
+                            :default-record="item"
+                          ></update-client-cost>
+                        </th>
+                      </tr>
                     </template>
-                  </v-simple-table>
+                  </v-data-table>
                 </v-expansion-panel-content>
               </v-expansion-panel>
             </v-expansion-panels>
@@ -240,17 +120,25 @@
 </template>
 <script lang="ts">
 import { defineComponent } from '@vue/composition-api'
-import HeaderBar from '~/components/option/OptionHeaderBar.vue'
+import { useGlobalState } from '../composables/useDefault'
+import AddClientCost from '~/components/option/AddClientCost.vue'
+import OptionHeaderBar from '~/components/option/OptionHeaderBar.vue'
+import UpdateClientCost from '~/components/option/UpdateClientCost.vue'
 
 export default defineComponent({
   components: {
-    HeaderBar,
+    OptionHeaderBar,
+    AddClientCost,
+    UpdateClientCost,
   },
-  //   middleware: 'userAuth',
   setup() {
+    const userState = useGlobalState()
     const dialog = false
     const checkbox = false
-    return { dialog, checkbox }
+    const filterClientOrCost = (n: number) => {
+      return userState.clientsAndCostsInfo.value.filter((r) => r.iflg === n)
+    }
+    return { dialog, checkbox, userState, filterClientOrCost }
   },
 })
 </script>

@@ -11,26 +11,42 @@
         mdi-greater-than
       </v-icon>
     </template>
-    <cash-dialog-form
+    <client-cost-form
       v-if="dialog"
       :dialog="dialog"
-      title="取引更新"
+      :title="title"
+      :subtitle="subtitle"
       :continue-flg="false"
+      :iflg="iflg"
       btn-name="更新"
       :default-records="defaultRecord"
-      @exec="updateCash"
+      @exec="updateClientCost"
       @open-close="dialogOpenClose"
-    ></cash-dialog-form>
+    ></client-cost-form>
   </v-dialog>
 </template>
 <script lang="ts">
 import { defineComponent, reactive, toRefs } from '@vue/composition-api'
 import { useGlobalState } from '../../composables/useDefault'
-import { RecordsManagement } from '../../composables/interface'
-import CashDialogForm from './CashDialogForm.vue'
+import { ClientsAndCosts } from '../../composables/interface'
+import ClientCostForm from './ClientCostForm.vue'
 export default defineComponent({
-  components: { CashDialogForm },
+  components: { ClientCostForm },
+
   props: {
+    title: {
+      type: String,
+
+      required: true,
+    },
+    subtitle: {
+      type: String,
+      required: true,
+    },
+    iflg: {
+      type: String,
+      required: true,
+    },
     defaultRecord: {
       type: Object,
       required: true,
@@ -46,15 +62,15 @@ export default defineComponent({
     const dialogOpenClose = (v: boolean) => {
       state.dialog = v
     }
-    const updateCash = (record: RecordsManagement, v: boolean) => {
+    const updateClientCost = (record: ClientsAndCosts, v: boolean) => {
       state.dialog = v
-      useState.updateRecordManagement(record)
+      // useState.updateRecordManagement(record)
     }
 
     return {
       ...toRefs(state),
       dialogOpenClose,
-      updateCash,
+      updateClientCost,
     }
   },
 })

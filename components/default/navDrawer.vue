@@ -39,6 +39,7 @@
 import {
   defineComponent,
   onBeforeMount,
+  onMounted,
   reactive,
   toRefs,
 } from '@vue/composition-api'
@@ -77,10 +78,11 @@ export default defineComponent({
     const switchNavVarCall = () => {
       ctx.emit('switch', !props.mini)
     }
-    onBeforeMount(() => {
+    onMounted(() => {
       const useState = useGlobalState()
-      if (useState.userInfo.value.office) {
-        state.office = useState.userInfo.value.office
+
+      if (useState.workInfo.value[0].name !== '') {
+        state.office = useState.workInfo.value[0].name
       }
     })
     return { items, switchNavVarCall, ...toRefs(state) }

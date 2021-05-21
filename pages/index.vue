@@ -6,7 +6,7 @@
     class="overflow-hidden"
   >
     <!-- ヘッダー項目 -->
-    <index-header-bar @complete="showMessage"></index-header-bar>
+    <index-header-bar></index-header-bar>
 
     <v-card flat rounded="0" class="mb-2">
       <!-- タブ項目一覧 -->
@@ -93,7 +93,6 @@
                         </span>
                         <update-cash-dialog
                           :default-record="item"
-                          @complete="showMessage"
                         ></update-cash-dialog>
                       </th>
                     </tr>
@@ -137,10 +136,15 @@
                           cols="12"
                         >
                           <v-list-item>
-                            <v-list-item-content class="text-caption"
+                            <v-list-item-content
+                              class="text-caption font-weight-bold"
+                              style="font-size: 0.8rem"
                               >{{ total.name }}:</v-list-item-content
                             >
-                            <v-list-item-content class="align-end">
+                            <v-list-item-content
+                              class="align-end font-weight-bold"
+                              style="font-size: 0.8rem"
+                            >
                               {{ total.pay.toLocaleString() }} 円
                             </v-list-item-content>
                           </v-list-item>
@@ -155,21 +159,13 @@
         </v-tab-item>
       </v-tabs-items>
     </v-card>
-    <v-snackbar v-model="snack.view" timeout="2000" :color="snack.color"
-      >{{ snack.text }}
-    </v-snackbar>
   </v-sheet>
 </template>
 
 <script lang="ts">
-import {
-  defineComponent,
-  reactive,
-  toRefs,
-  onBeforeMount,
-} from '@nuxtjs/composition-api'
-import UpdateCashDialog from '~/components/index/UpdateCashDialog.vue'
+import { defineComponent, reactive, toRefs } from '@nuxtjs/composition-api'
 import { useGlobalState } from '../composables/useDefault'
+import UpdateCashDialog from '~/components/index/UpdateCashDialog.vue'
 
 export default defineComponent({
   components: { UpdateCashDialog },
@@ -184,11 +180,6 @@ export default defineComponent({
           pay: number
         }
       ]
-      snack: {
-        text: string
-        color: string
-        view: boolean
-      }
     }>({
       tab: '',
       singleExpand: true,
@@ -198,11 +189,6 @@ export default defineComponent({
           pay: 0,
         },
       ],
-      snack: {
-        text: '',
-        color: '',
-        view: false,
-      },
     })
     const headers = [
       { text: 'data', value: 'subject', align: 'start' },
@@ -212,7 +198,7 @@ export default defineComponent({
       return userState.subjectsInfo.value.filter((s) => s.id === m)[0].name
     }
     const filterItemWithMonth = (m: string) => {
-      return userState.userRecordsManagement.value.filter((r) =>
+      return userState.workRecordsManagement.value.filter((r) =>
         (r.day.slice(0, 4) + r.day.slice(5, 7)).includes(m)
       )
     }
@@ -236,13 +222,6 @@ export default defineComponent({
       return totals
     }
 
-    const showMessage = (text: string, color: string, view: boolean) => {
-      console.log(text)
-      state.snack.text = text
-      state.snack.color = color
-      state.snack.view = view
-    }
-
     return {
       ...toRefs(state),
       headers,
@@ -250,7 +229,6 @@ export default defineComponent({
       userState,
       filterItemWithMonth,
       filterAndMergeItemWithMonth,
-      showMessage,
     }
   },
 })

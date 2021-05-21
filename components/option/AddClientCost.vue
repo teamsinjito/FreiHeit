@@ -1,5 +1,5 @@
 <template>
-  <!-- Newボタン -->
+  <!-- 取引先追加ボタン ダイアログ -->
   <v-dialog v-model="dialog" max-width="500px">
     <template #activator="{ on, attrs }">
       <v-btn
@@ -12,56 +12,70 @@
         New
       </v-btn>
     </template>
-
-    <cash-dialog-form
+    <client-cost-form
       v-if="dialog"
       :dialog="dialog"
-      title="取引追加"
+      :title="title"
+      :subtitle="subtitle"
       :continue-flg="true"
+      :iflg="iflg"
       btn-name="登録"
       :default-records="newRecord"
-      @exec="insertCash"
+      @exec="insertClientCost"
       @open-close="dialogOpenClose"
-    ></cash-dialog-form>
+    ></client-cost-form>
   </v-dialog>
 </template>
 <script lang="ts">
 import { defineComponent, reactive, toRefs } from '@vue/composition-api'
 import { useGlobalState } from '../../composables/useDefault'
-import { RecordsManagement } from '../../composables/interface'
-import CashDialogForm from './CashDialogForm.vue'
-
+import { ClientsAndCosts } from '../../composables/interface'
+import ClientCostForm from './ClientCostForm.vue'
 export default defineComponent({
-  components: { CashDialogForm },
-  setup(_props, context) {
+  components: { ClientCostForm },
+  props: {
+    title: {
+      type: String,
+
+      required: true,
+    },
+    subtitle: {
+      type: String,
+      required: true,
+    },
+    iflg: {
+      type: String,
+      required: true,
+    },
+  },
+
+  setup() {
     const useState = useGlobalState()
     const state = reactive<{
       dialog: boolean
-      newRecord: RecordsManagement
+      newRecord: ClientsAndCosts
     }>({
       dialog: false,
       newRecord: {
         id: '',
         wid: '',
-        pay: 0,
-        sid: '',
-        day: '',
-        cid: '',
-        note: '',
+        name: '',
+        iflg: 0,
       },
     })
     const dialogOpenClose = (v: boolean) => {
       state.dialog = v
     }
-    const insertCash = (record: RecordsManagement, v: boolean) => {
+    const insertClientCost = (record: ClientsAndCosts, v: boolean) => {
       state.dialog = v
-      useState.insertRecordManagement(record)
+      useState.insertClientCost(record)
+      // useState.insertRecordManagement(record)
     }
 
     return {
       ...toRefs(state),
       dialogOpenClose,
-      insertCash,
+      insertClientCost,
     }
   },
 })

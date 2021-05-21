@@ -10,8 +10,13 @@
       <v-container fluid class="fill-height">
         <nuxt />
       </v-container>
+      <v-snackbar
+        v-model="userState.snackInfo.value.view"
+        timeout="3000"
+        :color="userState.snackInfo.value.color"
+        >{{ userState.snackInfo.value.text }}
+      </v-snackbar>
     </v-main>
-
     <!-- フッター -->
     <v-footer color="justify-center text-caption">© 2021 Team SINJITO</v-footer>
   </v-app>
@@ -23,8 +28,9 @@ import {
   defineComponent,
   reactive,
   toRefs,
+  onMounted,
 } from '@nuxtjs/composition-api'
-import { provideGlobalState } from '../composables/useDefault'
+import { provideGlobalState, useGlobalState } from '../composables/useDefault'
 import appBar from '~/components/default/appBar.vue'
 import NavDrawer from '~/components/default/navDrawer.vue'
 export default defineComponent({
@@ -34,20 +40,20 @@ export default defineComponent({
     const state = reactive<{
       mini: boolean // ナビゲーションドロワーの開閉状態
     }>({
-      mini: true,
+      mini: false,
     })
+    provideGlobalState(context.root.$store.$auth.user.sub as string)
+    const userState = useGlobalState()
 
     // 関数群
     const switchNavVar = (m: boolean) => {
       state.mini = m
     }
-    onBeforeMount(() => {
-      provideGlobalState(context.root.$store.$auth.user.sub as string)
-    })
 
     return {
       ...toRefs(state),
       switchNavVar,
+      userState,
     }
   },
 })

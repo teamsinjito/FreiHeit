@@ -13,7 +13,7 @@
 
     <!-- Newボタン ダイアログ -->
 
-    <add-cash-dialog @com="shoM"></add-cash-dialog>
+    <add-cash-dialog></add-cash-dialog>
   </v-toolbar>
 </template>
 <script lang="ts">
@@ -25,11 +25,6 @@ export default defineComponent({
     ExportListDialog,
     AddCashDialog,
   },
-  setup(props, context) {
-    const shoM = (text: string, color: string, view: boolean) => {
-      context.emit('complete', text, color, view)
-    }
-    return { shoM }
-  },
+  setup() {},
 })
 </script>

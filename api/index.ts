@@ -5,11 +5,15 @@ import {
   connectPathUsers,
   connectPathInsertRecordsManagement,
   connectPathUpdateRecordsManagement,
+  connectPathDeleteRecordsManagement,
+  connectPathInsertClientCost,
+  connectPathUpdateClientCost,
+  connectPathDeleteClientCost,
+  connectPathChangeYearRecordsManagement,
 } from '../composables/routing'
 import {
   RecordsManagement,
-  Clients,
-  Costs,
+  ClientsAndCosts,
   StateInterface,
   Request,
 } from '../composables/interface'
@@ -35,16 +39,18 @@ app.post(connectPathUsers, async (req: Request, res) => {
   const client = await pool.connect()
   const input: StateInterface = {
     // ユーザ情報
-    userInfo: {
-      id: '',
-      office: '',
-    },
-
-    // 取引管理
-    userRecordsManagement: [
+    workInfo: [
       {
         id: '',
-        uid: '',
+        name: '',
+      },
+    ],
+
+    // 取引管理
+    workRecordsManagement: [
+      {
+        id: '',
+        wid: '',
         pay: 0,
         sid: '',
         day: '',
@@ -68,7 +74,8 @@ app.post(connectPathUsers, async (req: Request, res) => {
       {
         id: '',
         name: '',
-        itemFlg: 0,
+        wid: '',
+        iflg: 0,
       },
     ],
     // 現在の会計期間
@@ -76,13 +83,20 @@ app.post(connectPathUsers, async (req: Request, res) => {
 
     // タブ情報
     tabsInfo: [{ tab: '', content: '' }],
+
+    // スナックバー
+    snackInfo: {
+      text: '',
+      color: '',
+      view: false,
+    },
   }
   try {
     // ユーザ情報取得
     await client
-      .query(sql.userInfo.query, [req.body.key])
+      .query(sql.workInfo.query, [req.body.key])
       .then((result) => {
-        input.userInfo = result.rows[0]
+        input.workInfo = result.rows
         // console.log('userInfo', input.userInfo)
       })
       .catch((e) => {
@@ -92,12 +106,12 @@ app.post(connectPathUsers, async (req: Request, res) => {
     // 取引管理情報取得
     await client
       .query(sql.userRecordsManagement.query, [
-        input.userInfo.id,
+        input.workInfo[0].id,
         new Date().getFullYear() - 1 + '-01-01',
         new Date().getFullYear() - 1 + '-12-31',
       ])
       .then((result) => {
-        input.userRecordsManagement = result.rows
+        input.workRecordsManagement = result.rows
         // console.log('userRecordsManagement', input.userRecordsManagement)
       })
       .catch((e) => {
@@ -117,7 +131,7 @@ app.post(connectPathUsers, async (req: Request, res) => {
 
     // ユーザ情報取得
     await client
-      .query(sql.clientsAndCostsInfo.query, [input.userInfo.id])
+      .query(sql.clientsAndCostsInfo.query, [input.workInfo[0].id])
       .then((result) => {
         input.clientsAndCostsInfo = result.rows
         // console.log('userInfo', input.userInfo)
@@ -158,7 +172,7 @@ app.post(connectPathInsertRecordsManagement, async (req, res) => {
     await client
       .query(sql.insertRecordsManagement.query, [
         input.id,
-        input.uid,
+        input.wid,
         input.pay,
         input.sid,
         input.day,
@@ -191,7 +205,7 @@ app.post(connectPathUpdateRecordsManagement, async (req, res) => {
   try {
     // 取引管理テーブル更新
     await client
-      .query(sql.updateRecprdManagement.query, [
+      .query(sql.updateRecordManagement.query, [
         input.pay,
         input.sid,
         input.day,
@@ -202,6 +216,90 @@ app.post(connectPathUpdateRecordsManagement, async (req, res) => {
       .then(() => {
         console.log('DB:update complete')
         res.json(true)
+      })
+      .catch((e) => {
+        throw e
+      })
+  } catch (e) {
+    console.log(e)
+    res.json(false)
+  } finally {
+    if (client) client.release()
+  }
+})
+/// 取引管理テーブル 削除
+app.post(connectPathDeleteRecordsManagement, async (req, res) => {
+  const client = await pool.connect()
+  const input: string = req.body.key
+
+  console.log(input)
+
+  try {
+    // 取引管理テーブル更新
+    await client
+      .query(sql.deleteRecordManagement.query, [input])
+      .then(() => {
+        console.log('DB:delete complete')
+        res.json(true)
+      })
+      .catch((e) => {
+        throw e
+      })
+  } catch (e) {
+    console.log(e)
+    res.json(false)
+  } finally {
+    if (client) client.release()
+  }
+})
+
+/// 取引先固定経費テーブル 追加
+app.post(connectPathInsertClientCost, async (req, res) => {
+  const client = await pool.connect()
+  const input: ClientsAndCosts = req.body.key
+
+  console.log(input)
+
+  try {
+    await client
+      .query(sql.insertClientCost.query, [
+        input.id,
+        input.name,
+        input.wid,
+        input.iflg,
+      ])
+      .then(() => {
+        console.log('DB:insert complete')
+        res.json(true)
+        // console.log('userInfo', input.userInfo)
+      })
+      .catch((e) => {
+        throw e
+      })
+  } catch (e) {
+    console.log(e)
+    res.json(false)
+  } finally {
+    if (client) client.release()
+  }
+})
+
+/// 取引管理テーブル 再取得
+app.post(connectPathChangeYearRecordsManagement, async (req, res) => {
+  const client = await pool.connect()
+  const inputYear: number = req.body.key.y
+  const inputWid: string = req.body.key.id
+  try {
+    // 取引管理情報取得
+    await client
+      .query(sql.userRecordsManagement.query, [
+        inputWid,
+        inputYear + '-01-01',
+        inputYear + '-12-31',
+      ])
+      .then((result) => {
+        res.json(result.rows)
+        // console.log('userRecordsManagement', input.userRecordsManagement)
       })
       .catch((e) => {
         throw e

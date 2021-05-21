@@ -1,15 +1,15 @@
 // インターフェース一覧
 
 // ユーザ情報
-export interface Users {
+export interface Works {
   id: string
-  office: string
+  name: string
 }
 
 // ユーザ毎の取引管理
 export interface RecordsManagement {
   id: string
-  uid: string
+  wid: string
   pay: number
   sid: string
   day: string
@@ -21,7 +21,8 @@ export interface RecordsManagement {
 export interface ClientsAndCosts {
   id: string
   name: string
-  itemFlg: number
+  wid: string
+  iflg: number
 }
 
 // 勘定科目一覧
@@ -34,12 +35,13 @@ export interface Subjects {
 }
 
 export interface StateInterface {
-  userInfo: Users // ユーザ情報
-  userRecordsManagement: RecordsManagement[] // 取引管理
+  workInfo: Works[] // ユーザ情報
+  workRecordsManagement: RecordsManagement[] // 取引管理
   subjectsInfo: Subjects[] // 勘定科目一覧
   currentSysYear: { num: number } // 現在の会計期間
   clientsAndCostsInfo: ClientsAndCosts[] // 取引先および固定経費一覧
   tabsInfo: { tab: string; content: string }[] // タブ情報
+  snackInfo: { text: string; color: string; view: boolean } // スナックバー
 }
 
 export interface Request {

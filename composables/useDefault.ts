@@ -208,14 +208,16 @@ const createGlobalState = (userId: string) => {
       .then((res) => {
         if (res.data) {
           globalState.clientsAndCostsInfo.push(ary)
+
           console.log(globalState.clientsAndCostsInfo)
-          // if (ary.iflg === 1) {
-          //   console.log('取引先追加：成功!')
-          //   snackBarDisplay('取引先の登録が正常に完了しました。', '')
-          // } else {
-          //   console.log('固定経費追加：成功!')
-          //   snackBarDisplay('固定経費の登録が正常に完了しました。', '')
-          // }
+          if (ary.iflg === 1) {
+            console.log('取引先追加：成功!')
+            snackBarDisplay('取引先の登録が正常に完了しました。', '')
+          } else {
+            console.log(ary)
+            console.log('固定経費追加：成功!')
+            snackBarDisplay('固定経費の登録が正常に完了しました。', '')
+          }
         }
       })
       .catch(() => {

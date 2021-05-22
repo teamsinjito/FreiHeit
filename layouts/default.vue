@@ -1,7 +1,11 @@
 <template>
   <v-app>
     <!-- サイドバー -->
-    <nav-drawer :mini="mini" @switch="switchNavVar"></nav-drawer>
+    <nav-drawer
+      :mini="mini"
+      :work-info="userState.workInfo.value"
+      @switch="switchNavVar"
+    ></nav-drawer>
     <!-- ヘッダー -->
     <app-bar :mini="mini" @switch="switchNavVar"></app-bar>
 
@@ -44,7 +48,8 @@ export default defineComponent({
     })
     provideGlobalState(context.root.$store.$auth.user.sub as string)
     const userState = useGlobalState()
-
+    // console.log('useState.workInfo', userState.workInfo)
+    // console.log('userState.WorkINfo', userState.workInfo.value)
     // 関数群
     const switchNavVar = (m: boolean) => {
       state.mini = m

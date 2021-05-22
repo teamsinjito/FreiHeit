@@ -163,12 +163,18 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs } from '@nuxtjs/composition-api'
+import {
+  defineComponent,
+  reactive,
+  toRefs,
+  computed,
+} from '@nuxtjs/composition-api'
 import { useGlobalState } from '../composables/useDefault'
 import UpdateCashDialog from '~/components/index/UpdateCashDialog.vue'
 
 export default defineComponent({
   components: { UpdateCashDialog },
+
   setup() {
     const userState = useGlobalState()
     const state = reactive<{

@@ -44,7 +44,7 @@ export default defineComponent({
       required: true,
     },
     iflg: {
-      type: String,
+      type: Number,
       required: true,
     },
     defaultRecord: {

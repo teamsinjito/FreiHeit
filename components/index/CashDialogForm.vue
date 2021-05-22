@@ -181,10 +181,7 @@ export default defineComponent({
     const maxRules = [
       (v: string) => v.length <= 50 || '※50文字以下で入力してください',
     ]
-    const nameRules = [
-      (v: string) => !!v || '※入力必須です',
-      (v: string) => v.length <= 50 || '※50文字以下で入力してください',
-    ]
+    const nameRules = [(v: string) => !!v || '※入力必須です']
     const dayRules = [
       (v: string) => !!v || '※入力必須です',
       (v: string) => v.length <= 10 || '※10文字以下で入力してください',

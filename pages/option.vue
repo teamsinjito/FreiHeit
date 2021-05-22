@@ -28,7 +28,7 @@
                     <add-client-cost
                       title="取引先追加"
                       subtitle="取引先名称を入力してください"
-                      iflg="1"
+                      :iflg="clientNum"
                     ></add-client-cost>
                   </v-toolbar>
                   <v-divider></v-divider>
@@ -51,7 +51,7 @@
                           <update-client-cost
                             title="取引先更新"
                             subtitle="取引先名称を編集できます"
-                            iflg="1"
+                            :iflg="clientNum"
                             :default-record="item"
                           ></update-client-cost>
                         </th>
@@ -79,7 +79,7 @@
                     <add-client-cost
                       title="固定経費追加"
                       subtitle="固定経費を入力してください"
-                      iflg="2"
+                      :iflg="costNum"
                     ></add-client-cost>
                   </v-toolbar>
                   <v-divider></v-divider>
@@ -102,7 +102,7 @@
                           <update-client-cost
                             title="固定経費更新"
                             subtitle="固定経費名称を編集できます"
-                            iflg="2"
+                            :iflg="costNum"
                             :default-record="item"
                           ></update-client-cost>
                         </th>
@@ -124,7 +124,6 @@ import { useGlobalState } from '../composables/useDefault'
 import AddClientCost from '~/components/option/AddClientCost.vue'
 import OptionHeaderBar from '~/components/option/OptionHeaderBar.vue'
 import UpdateClientCost from '~/components/option/UpdateClientCost.vue'
-
 export default defineComponent({
   components: {
     OptionHeaderBar,
@@ -133,12 +132,23 @@ export default defineComponent({
   },
   setup() {
     const userState = useGlobalState()
+    const clientNum = 1
+    const costNum = 2
+
     const dialog = false
     const checkbox = false
     const filterClientOrCost = (n: number) => {
       return userState.clientsAndCostsInfo.value.filter((r) => r.iflg === n)
     }
-    return { dialog, checkbox, userState, filterClientOrCost }
+
+    return {
+      dialog,
+      checkbox,
+      userState,
+      filterClientOrCost,
+      clientNum,
+      costNum,
+    }
   },
 })
 </script>

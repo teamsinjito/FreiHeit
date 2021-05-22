@@ -7,10 +7,18 @@
         <v-icon>mdi-home-city</v-icon>
       </v-list-item-avatar>
 
-      <v-list-item-title>{{ office }}</v-list-item-title>
-      <v-btn icon @click.stop="switchNavVarCall">
+      <v-list-item-title
+        ><v-select
+          v-model="office"
+          :items="workInfo"
+          item-text="name"
+          item-value="id"
+          style="font-size: 0.9rem"
+        ></v-select
+      ></v-list-item-title>
+      <!-- <v-btn icon @click.stop="switchNavVarCall">
         <v-icon>mdi-chevron-left</v-icon>
-      </v-btn>
+      </v-btn> -->
     </v-list-item>
     <v-divider></v-divider>
 
@@ -51,6 +59,10 @@ export default defineComponent({
       type: Boolean,
       required: true,
     },
+    workInfo: {
+      type: Array,
+      required: true,
+    },
   },
   setup(props: { mini: boolean }, ctx) {
     const state = reactive<{
@@ -78,13 +90,7 @@ export default defineComponent({
     const switchNavVarCall = () => {
       ctx.emit('switch', !props.mini)
     }
-    onMounted(() => {
-      const useState = useGlobalState()
 
-      if (useState.workInfo.value[0].name !== '') {
-        state.office = useState.workInfo.value[0].name
-      }
-    })
     return { items, switchNavVarCall, ...toRefs(state) }
   },
 })

@@ -113,7 +113,7 @@
                   :single-expand="singleExpand"
                   :items-per-page="100"
                 >
-                  <template #default="{ items, isExpanded, expand }">
+                  <template #default="{ items }">
                     <v-card max-height="60vh" style="overflow: auto">
                       <v-card-title
                         class="text-caption font-weight-bold d-flex align-center py-0"
@@ -121,19 +121,16 @@
                         {{
                           userState.currentSysYear.value.num + month.tab
                         }}：集計表
-                        <v-switch
-                          :input-value="isExpanded(items[0])"
-                          class="pl-3"
-                          @change="(v) => expand(items[0], v)"
-                        ></v-switch>
+                        <v-switch v-model="switchFlg" class="pl-3"></v-switch>
                       </v-card-title>
 
                       <v-divider></v-divider>
-                      <v-list v-if="isExpanded(items[0])" dense>
+                      <v-list v-if="switchFlg === true" dense>
                         <v-col
                           v-for="total in items"
                           :key="total.name"
                           cols="12"
+                          class="py-0"
                         >
                           <v-list-item>
                             <v-list-item-content
@@ -148,6 +145,7 @@
                               {{ total.pay.toLocaleString() }} 円
                             </v-list-item-content>
                           </v-list-item>
+                          <v-divider></v-divider>
                         </v-col>
                       </v-list>
                     </v-card>
@@ -186,6 +184,7 @@ export default defineComponent({
           pay: number
         }
       ]
+      switchFlg: boolean
     }>({
       tab: '',
       singleExpand: true,
@@ -195,6 +194,7 @@ export default defineComponent({
           pay: 0,
         },
       ],
+      switchFlg: true,
     })
     const headers = [
       { text: 'data', value: 'subject', align: 'start' },
@@ -222,7 +222,10 @@ export default defineComponent({
         const sum = f.reduce((acc: number, record): number => {
           return acc + Number(record.pay)
         }, 0)
-        totals.push({ name: element.name, pay: sum })
+
+        if (sum !== 0 || element.requireflg === 1) {
+          totals.push({ name: element.name, pay: sum })
+        }
       })
 
       return totals

@@ -5,40 +5,42 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from '@vue/composition-api'
+import {
+  defineComponent,
+  reactive,
+  ref,
+  toRefs,
+  onMounted,
+  watch,
+} from '@vue/composition-api'
+import { pieType } from '@/composables/useChart'
 import { Chart } from 'chart.js'
+import ChartDataLabels from 'chartjs-plugin-datalabels'
 
 export default defineComponent({
-  setup() {
-    const canvasRef = ref<HTMLCanvasElement | null>(null)
-
-    onMounted(() => {
-      createCharts()
+  props: {
+    pieData: {
+      type: Object,
+      required: true,
+    },
+  },
+  setup(props: { pieData: pieType }) {
+    const state = reactive<{
+      chart: Chart | undefined
+    }>({
+      chart: undefined,
     })
-
-    const chartDataSample = {
-      labels: ['A社', 'B社', 'C社'],
-      datasets: [
-        {
-          backgroundColor: [
-            'rgba(219,39,91,0.5)',
-            'rgba(130,201,169,0.5)',
-            'rgba(255,183,76,0.5)',
-          ],
-          data: [50, 35, 15],
-        },
-      ],
-    }
+    const canvasRef = ref<HTMLCanvasElement | null>(null)
 
     const createCharts = () => {
       if (canvasRef.value === null) return
       const canvas = canvasRef.value.getContext('2d')
       if (canvas === null) return
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const chart = new Chart(canvas, {
+      state.chart = new Chart(canvas, {
+        plugins: [ChartDataLabels],
         type: 'pie',
-        data: chartDataSample,
+        data: props.pieData,
         options: {
           title: {
             display: true,
@@ -65,12 +67,39 @@ export default defineComponent({
           },
           // 縦横比固定設定解除
           maintainAspectRatio: false,
+          plugins: {
+            datalabels: {
+              color: '#000',
+              font: {
+                weight: 'bold',
+                size: 20,
+              },
+              formatter: (value) => {
+                return value + '%'
+              },
+            },
+          },
         },
       })
     }
+
+    onMounted(() => {
+      createCharts()
+    })
+
+    watch(
+      () => props.pieData,
+      (newPieData) => {
+        if (state.chart) {
+          state.chart.data = newPieData
+          state.chart.update()
+        }
+      }
+    )
+
     return {
+      ...toRefs(state),
       canvasRef,
-      createCharts,
     }
   },
 })

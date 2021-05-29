@@ -1,4 +1,8 @@
+export const connectDefaultWorks = '/getDefaultWorks'
 export const connectPathUsers = '/getAllDataUsers'
+export const connectPathInsertWorks = '/insertWorks'
+export const connectPathUpdateWorks = '/updateWorks'
+export const connectPathDeleteWorks = '/deleteWorks'
 export const connectPathInsertRecordsManagement = '/insertRecordsManagement'
 export const connectPathUpdateRecordsManagement = '/updateRecordsManagement'
 export const connectPathDeleteRecordsManagement = '/deleteRecordsManagement'
@@ -7,3 +11,5 @@ export const connectPathUpdateClientCost = '/updateClientCost'
 export const connectPathDeleteClientCost = '/deleteClientCost'
 export const connectPathChangeYearRecordsManagement =
   '/changeYearRecordsManagement'
+export const connectPathChangeWorksRecordsManagement =
+  '/changeWorksRecordsManagement'

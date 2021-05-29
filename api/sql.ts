@@ -1,4 +1,19 @@
 export const sql = {
+  defaultWorkInfo: {
+    query: `select id,name,last_select_time as last from works where uid = $1 order by last_select_time desc LIMIT 1`,
+  },
+  updateWorkLastTime: {
+    query: 'update works set last_select_time = $1 where id = $2 ;',
+  },
+  insertWork: {
+    query: 'insert into works(id,uid,name) values($1,$2,$3);',
+  },
+  updateWork: {
+    query: 'update works set name = $1 where id = $2 ;',
+  },
+  deleteWork: {
+    query: 'delete from works where id = $1 ;',
+  },
   workInfo: {
     query:
       'select id,name from works where uid = $1 order by last_select_time desc',
@@ -62,5 +77,11 @@ export const sql = {
       item_flg
     ) 
     values($1,$2,$3,$4);`,
+  },
+  updateClientCost: {
+    query: 'update clients_and_costs set name = $1 where id = $2 ;',
+  },
+  deleteClientCost: {
+    query: 'delete from clients_and_costs where id = $1 ;',
   },
 }

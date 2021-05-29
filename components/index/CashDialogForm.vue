@@ -173,7 +173,7 @@ export default defineComponent({
     // ルール
     const payRules = [
       (v: string) => !!v || '※入力必須です',
-      (v: string) => v.length <= 14 || '※12桁以下で入力してください',
+      (v: string) => v.length <= 12 || '※9桁以下で入力してください',
       (v: string) =>
         /^0$|^[1-9]\d{0,2}(,\d{3})*$|^[0-9 ]+$/.test(v) ||
         '※半角数値のみ入力してください',

@@ -10,10 +10,10 @@
     <v-divider></v-divider>
     <v-card flat rounded="0" class="mb-2 py-5">
       <v-card-text>
-        <v-row
-          ><v-col cols="12" sm="6">
-            <v-expansion-panels focusable multiple>
-              <v-expansion-panel>
+        <v-row>
+          <v-expansion-panels v-model="panel" focusable multiple>
+            <v-col cols="12" sm="6">
+              <v-expansion-panel :key="0">
                 <v-expansion-panel-header color="primary" class="white--text"
                   >取引先設定 </v-expansion-panel-header
                 ><v-expansion-panel-content class="pt-5">
@@ -60,11 +60,9 @@
                   </v-data-table>
                 </v-expansion-panel-content>
               </v-expansion-panel>
-            </v-expansion-panels>
-          </v-col>
-          <v-col cols="12" sm="6">
-            <v-expansion-panels focusable multiple>
-              <v-expansion-panel>
+            </v-col>
+            <v-col cols="12" sm="6">
+              <v-expansion-panel :key="1">
                 <v-expansion-panel-header color="primary" class="white--text"
                   >固定経費設定 </v-expansion-panel-header
                 ><v-expansion-panel-content class="pt-5">
@@ -111,15 +109,15 @@
                   </v-data-table>
                 </v-expansion-panel-content>
               </v-expansion-panel>
-            </v-expansion-panels>
-          </v-col>
+            </v-col>
+          </v-expansion-panels>
         </v-row>
       </v-card-text>
     </v-card>
   </v-sheet>
 </template>
 <script lang="ts">
-import { defineComponent } from '@vue/composition-api'
+import { defineComponent, reactive, toRefs } from '@vue/composition-api'
 import { useGlobalState } from '../composables/useDefault'
 import AddClientCost from '~/components/option/AddClientCost.vue'
 import OptionHeaderBar from '~/components/option/OptionHeaderBar.vue'
@@ -134,7 +132,9 @@ export default defineComponent({
     const userState = useGlobalState()
     const clientNum = 1
     const costNum = 2
-
+    const state = reactive<{
+      panel: number[]
+    }>({ panel: [0, 1] })
     const dialog = false
     const checkbox = false
     const filterClientOrCost = (n: number) => {
@@ -148,6 +148,7 @@ export default defineComponent({
       filterClientOrCost,
       clientNum,
       costNum,
+      ...toRefs(state),
     }
   },
 })

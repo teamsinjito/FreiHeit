@@ -4,8 +4,13 @@
 export interface Works {
   id: string
   name: string
+  last: string
 }
-
+export interface InsertUpdateWorks {
+  id: string
+  uid: string
+  name: string
+}
 // ユーザ毎の取引管理
 export interface RecordsManagement {
   id: string
@@ -43,7 +48,10 @@ export interface StateInterface {
   tabsInfo: { tab: string; content: string }[] // タブ情報
   snackInfo: { text: string; color: string; view: boolean } // スナックバー
 }
-
+export interface WorkChange {
+  workRecordsManagement: RecordsManagement[] // 取引管理
+  clientsAndCostsInfo: ClientsAndCosts[] // 取引先および固定経費一覧
+}
 export interface Request {
   body: { key: string }
 }

@@ -23,7 +23,7 @@
           <v-card-subtitle class="px-0 mb-4">{{ subtitle }}</v-card-subtitle>
           <v-row>
             <v-text-field
-              v-model="inputClientCost"
+              v-model="inputMyOffice"
               required
               autofocus
               :rules="nameRules"
@@ -54,7 +54,7 @@
 <script lang="ts">
 import { defineComponent, ref, reactive, toRefs } from '@vue/composition-api'
 import { useGlobalState } from '../../composables/useDefault'
-import { ClientsAndCosts } from '../../composables/interface'
+import { Works } from '../../composables/interface'
 
 export default defineComponent({
   props: {
@@ -74,10 +74,7 @@ export default defineComponent({
       type: Boolean,
       required: true,
     },
-    iflg: {
-      type: Number,
-      required: true,
-    },
+
     btnName: {
       type: String,
       required: true,
@@ -92,21 +89,20 @@ export default defineComponent({
       dialog: boolean
       title: string
       continueFlg: boolean
-      iflg: number
-      defaultRecords: ClientsAndCosts
+      defaultRecords: Works
     },
     context
   ) {
     const state = reactive<{
       valid: boolean
       checkbox: boolean
-      inputClientCost: string
+      inputMyOffice: string
       id: string
     }>({
       valid: false,
       checkbox: props.continueFlg,
       id: props.defaultRecords.id,
-      inputClientCost: props.defaultRecords.name,
+      inputMyOffice: props.defaultRecords.name,
     })
 
     const userState = useGlobalState()
@@ -130,18 +126,20 @@ export default defineComponent({
         'exec',
         {
           id: state.id,
-          wid: userState.workInfo.value[0].id,
-          name: state.inputClientCost,
-          iflg: props.iflg,
+          uid: context.root.$store.$auth.user.sub as string,
+          name: state.inputMyOffice,
         },
         state.checkbox
       )
     }
     const deleteRecord = () => {
-      if (confirm('削除してもよろしいですか？')) {
-        userState.deleteClientCost(state.id, props.iflg).then(() => {
-          context.emit('open-close', !props.dialog)
-        })
+      if (
+        confirm(
+          '削除してもよろしいですか？ 登録してある取引や取引先、固定経費も全て削除されます。'
+        )
+      ) {
+        userState.deleteMyOffice(state.id)
+        context.emit('open-close', !props.dialog)
       }
     }
     return {

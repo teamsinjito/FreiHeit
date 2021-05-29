@@ -3,22 +3,22 @@
   <v-navigation-drawer :mini-variant="mini" fixed permanent app dark>
     <!-- 会社名 -->
     <v-list-item class="px-2 my-sm-1">
-      <v-list-item-avatar color="primary">
-        <v-icon>mdi-home-city</v-icon>
-      </v-list-item-avatar>
+      <nuxt-link :to="headItem.to">
+        <v-list-item-avatar color="primary">
+          <v-icon>mdi-home-city</v-icon>
+        </v-list-item-avatar>
+      </nuxt-link>
 
       <v-list-item-title
         ><v-select
-          v-model="office"
+          v-model="currentOffice"
           :items="workInfo"
           item-text="name"
           item-value="id"
           style="font-size: 0.9rem"
+          @change="changeCarrentWork()"
         ></v-select
       ></v-list-item-title>
-      <!-- <v-btn icon @click.stop="switchNavVarCall">
-        <v-icon>mdi-chevron-left</v-icon>
-      </v-btn> -->
     </v-list-item>
     <v-divider></v-divider>
 
@@ -49,10 +49,11 @@ import {
   onBeforeMount,
   onMounted,
   reactive,
+  ref,
   toRefs,
 } from '@vue/composition-api'
+import { Works } from '../../composables/interface'
 import { useGlobalState } from '~/composables/useDefault'
-
 export default defineComponent({
   props: {
     mini: {
@@ -63,13 +64,25 @@ export default defineComponent({
       type: Array,
       required: true,
     },
+    office: {
+      type: Object,
+      required: true,
+    },
   },
-  setup(props: { mini: boolean }, ctx) {
+
+  setup(props: { mini: boolean; workInfo: Works[]; office: Works }) {
+    const userState = useGlobalState()
     const state = reactive<{
-      office: string
+      currentOffice: string
     }>({
-      office: '名無し',
+      currentOffice: props.office.id,
     })
+    // onMounted(() => {
+    //   state.currentOffice = props.office
+    // })
+    const headItem = {
+      to: '/mypage',
+    }
     const items = [
       {
         icon: 'mdi-apps',
@@ -87,11 +100,13 @@ export default defineComponent({
         to: '/option',
       },
     ]
-    const switchNavVarCall = () => {
-      ctx.emit('switch', !props.mini)
+
+    const changeCarrentWork = () => {
+      console.log('事業所切り替え', state.currentOffice)
+      userState.changeWorksRecordsManagement(state.currentOffice)
     }
 
-    return { items, switchNavVarCall, ...toRefs(state) }
+    return { headItem, items, ...toRefs(state), changeCarrentWork }
   },
 })
 </script>

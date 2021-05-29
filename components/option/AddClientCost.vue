@@ -69,7 +69,6 @@ export default defineComponent({
     const insertClientCost = (record: ClientsAndCosts, v: boolean) => {
       state.dialog = v
       useState.insertClientCost(record)
-      // useState.insertRecordManagement(record)
     }
 
     return {

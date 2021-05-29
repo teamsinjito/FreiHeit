@@ -11,27 +11,26 @@
         mdi-greater-than
       </v-icon>
     </template>
-    <client-cost-form
+    <my-office-form
       v-if="dialog"
       :dialog="dialog"
       :title="title"
       :subtitle="subtitle"
       :continue-flg="false"
-      :iflg="iflg"
       btn-name="更新"
       :default-records="defaultRecord"
       @exec="updateClientCost"
       @open-close="dialogOpenClose"
-    ></client-cost-form>
+    ></my-office-form>
   </v-dialog>
 </template>
 <script lang="ts">
 import { defineComponent, reactive, toRefs } from '@vue/composition-api'
 import { useGlobalState } from '../../composables/useDefault'
-import { ClientsAndCosts } from '../../composables/interface'
-import ClientCostForm from './ClientCostForm.vue'
+import { InsertUpdateWorks } from '../../composables/interface'
+import MyOfficeForm from './MyOfficeForm.vue'
 export default defineComponent({
-  components: { ClientCostForm },
+  components: { MyOfficeForm },
 
   props: {
     title: {
@@ -41,10 +40,6 @@ export default defineComponent({
     },
     subtitle: {
       type: String,
-      required: true,
-    },
-    iflg: {
-      type: Number,
       required: true,
     },
     defaultRecord: {
@@ -62,10 +57,10 @@ export default defineComponent({
     const dialogOpenClose = (v: boolean) => {
       state.dialog = v
     }
-    const updateClientCost = (record: ClientsAndCosts, v: boolean) => {
+    const updateClientCost = (record: InsertUpdateWorks, v: boolean) => {
       state.dialog = v
-
-      useState.updateClientCost(record)
+      useState.updateMyOffice(record)
+      // useState.updateClientCost(record)
     }
 
     return {

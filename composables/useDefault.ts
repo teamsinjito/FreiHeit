@@ -9,7 +9,11 @@ import {
 import axios from 'axios'
 import { v4 as uuidv4 } from 'uuid'
 import {
+  connectDefaultWorks,
   connectPathUsers,
+  connectPathInsertWorks,
+  connectPathUpdateWorks,
+  connectPathDeleteWorks,
   connectPathInsertRecordsManagement,
   connectPathUpdateRecordsManagement,
   connectPathDeleteRecordsManagement,
@@ -17,11 +21,15 @@ import {
   connectPathUpdateClientCost,
   connectPathDeleteClientCost,
   connectPathChangeYearRecordsManagement,
+  connectPathChangeWorksRecordsManagement,
 } from '../composables/routing'
 import {
+  Works,
+  InsertUpdateWorks,
   RecordsManagement,
   StateInterface,
   ClientsAndCosts,
+  WorkChange,
 } from '../composables/interface'
 
 const createGlobalState = (userId: string) => {
@@ -32,6 +40,7 @@ const createGlobalState = (userId: string) => {
       {
         id: '',
         name: '',
+        last: '',
       },
     ],
 
@@ -82,6 +91,15 @@ const createGlobalState = (userId: string) => {
     },
   })
 
+  // オーバーレイ用情報
+  const overlayState = reactive<{
+    overlayText: string
+    overlayShow: boolean
+  }>({
+    overlayText: '',
+    overlayShow: false,
+  })
+
   // グローバルstateにセット
   const setGrobalStateCall = async (authId: string) => {
     await axios
@@ -90,6 +108,7 @@ const createGlobalState = (userId: string) => {
       })
       .then((data) => {
         if (data.data != null) {
+          console.log('data.data', data.data.workRecordsManagement)
           globalState.workInfo = data.data.workInfo
           globalState.workRecordsManagement = data.data.workRecordsManagement
           globalState.subjectsInfo = data.data.subjectsInfo
@@ -104,7 +123,78 @@ const createGlobalState = (userId: string) => {
         alert('初期処理に失敗しました。')
       })
   }
+  // 事業所追加
+  const insertMyOffice = async (ary: InsertUpdateWorks) => {
+    // uuid生成
+    ary.id = uuidv4()
+    await axios
+      .post<InsertUpdateWorks>(`/api${connectPathInsertWorks}`, {
+        key: ary,
+      })
+      .then((res) => {
+        if (res.data) {
+          globalState.workInfo.push({ id: ary.id, name: ary.name, last: '' })
 
+          console.log('事業所追加：成功!')
+          snackBarDisplay('事業所の登録が正常に完了しました。', '')
+        } else {
+          snackBarDisplay('事業所の登録が失敗しました。', 'error')
+        }
+      })
+      .catch(() => {
+        snackBarDisplay('事業所の登録が失敗しました。', 'error')
+      })
+  }
+  // 事業所更新
+  const updateMyOffice = async (ary: InsertUpdateWorks) => {
+    await axios
+      .post<InsertUpdateWorks>(`/api${connectPathUpdateWorks}`, {
+        key: ary,
+      })
+      .then((res) => {
+        if (res.data) {
+          const row = globalState.workInfo.filter((r) => r.id === ary.id)[0]
+          row.name = ary.name
+
+          console.log('事業所更新：成功!')
+          snackBarDisplay('事業所の更新が正常に完了しました。', '')
+        } else {
+          snackBarDisplay('事業所の更新が失敗しました。', 'error')
+        }
+      })
+      .catch(() => {
+        snackBarDisplay('事業所の更新が失敗しました。', 'error')
+      })
+  }
+  // 事業所削除
+  const deleteMyOffice = async (id: string) => {
+    await axios
+      .post(`/api${connectPathDeleteWorks}`, {
+        key: id,
+      })
+      .then((res) => {
+        if (res.data) {
+          globalState.workInfo = globalState.workInfo.filter((r) => r.id !== id)
+
+          // 取引管理state 削除
+          globalState.workRecordsManagement = globalState.workRecordsManagement.filter(
+            (r) => r.wid !== id
+          )
+
+          globalState.clientsAndCostsInfo = globalState.clientsAndCostsInfo.filter(
+            (r) => r.wid !== id
+          )
+
+          console.log('事業所削除：成功!')
+          snackBarDisplay('事業所の削除が正常に完了しました。', '')
+        } else {
+          snackBarDisplay('事業所の削除が失敗しました。', 'error')
+        }
+      })
+      .catch(() => {
+        snackBarDisplay('事業所の削除が失敗しました。', 'error')
+      })
+  }
   // 取引管理追加
   const insertRecordManagement = async (ary: RecordsManagement) => {
     // uuid生成
@@ -222,11 +312,78 @@ const createGlobalState = (userId: string) => {
       })
       .catch(() => {
         if (ary.iflg === 1) {
-          console.log('取引先追加：成功!')
-          snackBarDisplay('取引先の登録が正常に完了しました。', '')
+          console.log('取引先追加：失敗!')
+          snackBarDisplay('取引先の登録が失敗しました。', '')
         } else {
-          console.log('固定経費追加：成功!')
-          snackBarDisplay('固定経費の登録が正常に完了しました。', '')
+          console.log('固定経費追加：失敗!')
+          snackBarDisplay('固定経費の登録が失敗しました。', '')
+        }
+      })
+  }
+  // 取引先もしくは固定経費更新
+  const updateClientCost = async (ary: ClientsAndCosts) => {
+    await axios
+      .post<ClientsAndCosts>(`/api${connectPathUpdateClientCost}`, {
+        key: ary,
+      })
+      .then((res) => {
+        if (res.data) {
+          const row = globalState.clientsAndCostsInfo.filter(
+            (r) => r.id === ary.id
+          )[0]
+
+          row.name = ary.name
+
+          if (ary.iflg === 1) {
+            console.log('取引先更新：成功!')
+            snackBarDisplay('取引先の更新が正常に完了しました。', '')
+          } else {
+            console.log(ary)
+            console.log('固定経費更新：成功!')
+            snackBarDisplay('固定経費の更新が正常に完了しました。', '')
+          }
+        }
+      })
+      .catch(() => {
+        if (ary.iflg === 1) {
+          console.log('取引先更新：失敗!')
+          snackBarDisplay('取引先の更新が失敗しました。', 'error')
+        } else {
+          console.log(ary)
+          console.log('固定経費更新：失敗!')
+          snackBarDisplay('固定経費の更新が失敗しました。', 'error')
+        }
+      })
+  }
+
+  // 取引先もしくは固定経費削除
+  const deleteClientCost = async (id: string, flg: number) => {
+    await axios
+      .post(`/api${connectPathDeleteClientCost}`, {
+        key: id,
+      })
+      .then((res) => {
+        if (res.data) {
+          globalState.clientsAndCostsInfo = globalState.clientsAndCostsInfo.filter(
+            (r) => r.id !== id
+          )
+
+          if (flg === 1) {
+            console.log('取引先削除：成功!')
+            snackBarDisplay('取引先の削除が正常に完了しました。', '')
+          } else {
+            console.log('固定経費削除：成功!')
+            snackBarDisplay('固定経費の削除が正常に完了しました。', '')
+          }
+        }
+      })
+      .catch(() => {
+        if (flg === 1) {
+          console.log('取引先削除：失敗!')
+          snackBarDisplay('取引先の削除が失敗しました。', 'error')
+        } else {
+          console.log('固定経費削除：失敗!')
+          snackBarDisplay('固定経費の削除が失敗しました。', 'error')
         }
       })
   }
@@ -261,7 +418,51 @@ const createGlobalState = (userId: string) => {
         )
       })
   }
+  // 事業所切り替え
+  const changeWorksRecordsManagement = async (workId: string) => {
+    const nowDateTime = new Date().toISOString()
+    await axios
+      .post<WorkChange>(`/api${connectPathChangeWorksRecordsManagement}`, {
+        key: {
+          id: workId,
+          y: globalState.currentSysYear.num,
+          now: nowDateTime,
+        },
+      })
+      .then((res) => {
+        globalState.workRecordsManagement = res.data.workRecordsManagement
+        globalState.clientsAndCostsInfo = res.data.clientsAndCostsInfo
+        globalState.workInfo.filter(
+          (f) => f.id === workId
+        )[0].last = nowDateTime
 
+        // ソート
+        globalState.workInfo.sort((n1, n2) => {
+          if (n1.last > n2.last) {
+            return -1
+          }
+          if (n1.last < n2.last) {
+            return 1
+          }
+          return 0
+        })
+        // ソート
+        globalState.workRecordsManagement.sort((n1, n2) => {
+          if (n1.day > n2.day) {
+            return -1
+          }
+          if (n1.day < n2.day) {
+            return 1
+          }
+          return 0
+        })
+
+        snackBarDisplay('事業所を切り替えました。', '')
+      })
+      .catch(() => {
+        snackBarDisplay('事業所の切り替えができませんでした。', 'error')
+      })
+  }
   // スナックバー表示
   const snackBarDisplay = (message: string, color: string) => {
     globalState.snackInfo.text = message
@@ -282,16 +483,44 @@ const createGlobalState = (userId: string) => {
 
   return {
     ...toRefs(globalState),
+    ...toRefs(overlayState),
     setGrobalStateCall,
+    insertMyOffice,
+    updateMyOffice,
+    deleteMyOffice,
     insertRecordManagement,
     updateRecordManagement,
     deleteRecordManagement,
     insertClientCost,
+    updateClientCost,
+    deleteClientCost,
+    changeWorksRecordsManagement,
     changeYearRecordsManagement,
     snackBarDisplay,
   }
 }
-
+export const getDefaultWork = (authId: string): Promise<Works> =>
+  new Promise((resolve, reject) => {
+    axios
+      .post<Works>(`/api${connectDefaultWorks}`, {
+        key: authId,
+      })
+      .then((data) => {
+        if (data.data != null) {
+          resolve({
+            id: data.data.id,
+            name: data.data.name,
+            last: data.data.last,
+          })
+        } else {
+          reject(new Error('NG'))
+          alert('初期処理に失敗しました。')
+        }
+      })
+      .catch(() => {
+        alert('初期処理に失敗しました。')
+      })
+  })
 // キー生成
 type GlobalStateType = ReturnType<typeof createGlobalState>
 export const GlobalStateKey: InjectionKey<GlobalStateType> = Symbol(

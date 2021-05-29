@@ -19,6 +19,7 @@
     "@types/pg": "^7.14.11",
     "@types/uuid": "^8.3.0",
     "chart.js": "^2",
+    "chartjs-plugin-datalabels": "^1.0.0",
     "core-js": "^3.9.1",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",

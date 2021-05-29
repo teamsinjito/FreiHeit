@@ -1,38 +1,37 @@
 <template>
+  <!-- 事業所追加ボタン ダイアログ -->
   <v-dialog v-model="dialog" max-width="500px">
     <template #activator="{ on, attrs }">
-      <v-icon
-        small
-        style="font-size: 0.4rem"
-        class="ml-sm-3 text-sm-caption font-weight-bold"
+      <v-btn
+        color="primary"
+        dark
+        class="text-sm-button text-caption"
         v-bind="attrs"
         v-on="on"
       >
-        mdi-greater-than
-      </v-icon>
+        New
+      </v-btn>
     </template>
-    <client-cost-form
+    <my-office-form
       v-if="dialog"
       :dialog="dialog"
       :title="title"
       :subtitle="subtitle"
-      :continue-flg="false"
-      :iflg="iflg"
-      btn-name="更新"
-      :default-records="defaultRecord"
-      @exec="updateClientCost"
+      :continue-flg="true"
+      btn-name="登録"
+      :default-records="newRecord"
+      @exec="insertClientCost"
       @open-close="dialogOpenClose"
-    ></client-cost-form>
+    ></my-office-form>
   </v-dialog>
 </template>
 <script lang="ts">
 import { defineComponent, reactive, toRefs } from '@vue/composition-api'
 import { useGlobalState } from '../../composables/useDefault'
-import { ClientsAndCosts } from '../../composables/interface'
-import ClientCostForm from './ClientCostForm.vue'
+import { Works, InsertUpdateWorks } from '../../composables/interface'
+import MyOfficeForm from './MyOfficeForm.vue'
 export default defineComponent({
-  components: { ClientCostForm },
-
+  components: { MyOfficeForm },
   props: {
     title: {
       type: String,
@@ -43,35 +42,34 @@ export default defineComponent({
       type: String,
       required: true,
     },
-    iflg: {
-      type: Number,
-      required: true,
-    },
-    defaultRecord: {
-      type: Object,
-      required: true,
-    },
   },
+
   setup() {
     const useState = useGlobalState()
     const state = reactive<{
       dialog: boolean
+      newRecord: Works
     }>({
       dialog: false,
+      newRecord: {
+        id: '',
+        name: '',
+        last: '',
+      },
     })
     const dialogOpenClose = (v: boolean) => {
       state.dialog = v
     }
-    const updateClientCost = (record: ClientsAndCosts, v: boolean) => {
+    const insertClientCost = (record: InsertUpdateWorks, v: boolean) => {
       state.dialog = v
-
-      useState.updateClientCost(record)
+      useState.insertMyOffice(record)
+      // useState.insertClientCost(record)
     }
 
     return {
       ...toRefs(state),
       dialogOpenClose,
-      updateClientCost,
+      insertClientCost,
     }
   },
 })

@@ -5,98 +5,39 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from '@vue/composition-api'
+import {
+  defineComponent,
+  reactive,
+  ref,
+  toRefs,
+  onMounted,
+  watch,
+} from '@vue/composition-api'
+import { barType } from '@/composables/useChart'
 import { Chart } from 'chart.js'
 
 export default defineComponent({
-  setup() {
-    const canvasRef = ref<HTMLCanvasElement | null>(null)
-
-    onMounted(() => {
-      createCharts()
+  props: {
+    barData: {
+      type: Object,
+      required: true,
+    },
+  },
+  setup(props: { barData: barType }) {
+    const state = reactive<{
+      chart: Chart | undefined
+    }>({
+      chart: undefined,
     })
-
-    const chartDataSample = {
-      labels: [
-        '2021-01',
-        '2021-02',
-        '2021-03',
-        '2021-04',
-        '2021-05',
-        '2021-06',
-        '2021-07',
-        '2021-08',
-        '2021-09',
-        '2021-10',
-        '2021-11',
-        '2021-12',
-      ],
-      datasets: [
-        {
-          label: 'A社',
-          data: [
-            620000,
-            650000,
-            930000,
-            850000,
-            510000,
-            660000,
-            470000,
-            550000,
-            450000,
-            730000,
-            750000,
-            410000,
-          ],
-          backgroundColor: 'rgba(219,39,91,0.5)',
-        },
-        {
-          label: 'B社',
-          data: [
-            550000,
-            450000,
-            730000,
-            750000,
-            410000,
-            450000,
-            580000,
-            620000,
-            550000,
-            310000,
-            450000,
-            380000,
-          ],
-          backgroundColor: 'rgba(130,201,169,0.5)',
-        },
-        {
-          label: 'C社',
-          data: [
-            330000,
-            450000,
-            620000,
-            550000,
-            310000,
-            450000,
-            380000,
-            620000,
-            550000,
-            310000,
-            450000,
-            380000,
-          ],
-          backgroundColor: 'rgba(255,183,76,0.5)',
-        },
-      ],
-    }
+    const canvasRef = ref<HTMLCanvasElement | null>(null)
 
     const createCharts = () => {
       if (canvasRef.value === null) return
       const canvas = canvasRef.value.getContext('2d')
       if (canvas === null) return
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const chart = new Chart(canvas, {
+      state.chart = new Chart(canvas, {
         type: 'bar',
-        data: chartDataSample,
+        data: props.barData,
         options: {
           title: {
             display: true,
@@ -129,9 +70,6 @@ export default defineComponent({
                   fontSize: 16,
                 },
                 ticks: {
-                  suggestedMax: 2000000,
-                  suggestedMin: 0,
-                  stepSize: 500000,
                   callback: (value) => {
                     return value + ' 円'
                   },
@@ -144,9 +82,24 @@ export default defineComponent({
         },
       })
     }
+
+    onMounted(() => {
+      createCharts()
+    })
+
+    watch(
+      () => props.barData,
+      (newBarData) => {
+        if (state.chart) {
+          state.chart.data = newBarData
+          state.chart.update()
+        }
+      }
+    )
+
     return {
+      ...toRefs(state),
       canvasRef,
-      createCharts,
     }
   },
 })

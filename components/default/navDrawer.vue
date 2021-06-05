@@ -3,11 +3,9 @@
   <v-navigation-drawer :mini-variant="mini" fixed permanent app dark>
     <!-- 会社名 -->
     <v-list-item class="px-2 my-sm-1">
-      <nuxt-link :to="headItem.to">
-        <v-list-item-avatar color="primary">
-          <v-icon>mdi-home-city</v-icon>
-        </v-list-item-avatar>
-      </nuxt-link>
+      <v-list-item-avatar color="primary">
+        <v-icon>mdi-home-city</v-icon>
+      </v-list-item-avatar>
 
       <v-list-item-title
         ><v-select
@@ -80,14 +78,21 @@ export default defineComponent({
     // onMounted(() => {
     //   state.currentOffice = props.office
     // })
-    const headItem = {
-      to: '/mypage',
-    }
     const items = [
       {
         icon: 'mdi-apps',
         title: '取引管理',
         to: '/',
+      },
+      {
+        icon: 'mdi-home-account',
+        title: 'マイページ',
+        to: '/mypage',
+      },
+      {
+        icon: 'mdi-table',
+        title: '項目別集計表',
+        to: '/totals',
       },
       {
         icon: 'mdi-chart-bar',
@@ -106,7 +111,7 @@ export default defineComponent({
       userState.changeWorksRecordsManagement(state.currentOffice)
     }
 
-    return { headItem, items, ...toRefs(state), changeCarrentWork }
+    return { items, ...toRefs(state), changeCarrentWork }
   },
 })
 </script>

@@ -1,5 +1,5 @@
 <template>
-  <div class="my-chart-area">
+  <div id="pieChart" class="my-chart-area">
     <canvas ref="canvasRef" />
   </div>
 </template>
@@ -69,10 +69,9 @@ export default defineComponent({
           maintainAspectRatio: false,
           plugins: {
             datalabels: {
-              color: '#000',
+              color: '#000000',
               font: {
-                weight: 'bold',
-                size: 20,
+                size: 10,
               },
               formatter: (value) => {
                 return value + '%'

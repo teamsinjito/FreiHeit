@@ -45,6 +45,11 @@
                     <template #[`item`]="{ item }">
                       <tr>
                         <th class="text-caption">
+                          <v-avatar
+                            :color="item.color"
+                            size="13"
+                            class="mr-3"
+                          ></v-avatar>
                           {{ item.name }}
                         </th>
                         <th class="text-right">
@@ -94,6 +99,11 @@
                     <template #[`item`]="{ item }">
                       <tr>
                         <th class="text-caption">
+                          <v-avatar
+                            :color="item.color"
+                            size="13"
+                            class="mr-3"
+                          ></v-avatar>
                           {{ item.name }}
                         </th>
                         <th class="text-right">

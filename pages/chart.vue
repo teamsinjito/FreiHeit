@@ -10,8 +10,8 @@
     <v-divider></v-divider>
     <v-card flat rounded="0" class="mb-2 py-5">
       <v-card-text>
-        <v-expansion-panels v-model="panel" focusable multiple>
-          <v-row>
+        <v-row>
+          <v-expansion-panels v-model="panel" focusable multiple>
             <v-col cols="12" md="3">
               <v-expansion-panel :key="0">
                 <v-expansion-panel-header color="primary" class="white--text">
@@ -92,7 +92,7 @@
                 <v-expansion-panel-header color="primary" class="white--text">
                   グラフ
                 </v-expansion-panel-header>
-                <v-expansion-panel-content class="pt-5">
+                <v-expansion-panel-content id="chartPanel" class="pt-5">
                   <v-row v-if="chartShow">
                     <v-col cols="12" sm="12" md="6">
                       <bar-chart :bar-data="barChartData" />
@@ -104,8 +104,8 @@
                 </v-expansion-panel-content>
               </v-expansion-panel>
             </v-col>
-          </v-row>
-        </v-expansion-panels>
+          </v-expansion-panels>
+        </v-row>
       </v-card-text>
     </v-card>
   </v-sheet>
@@ -138,6 +138,7 @@ export default defineComponent({
       sliderStart: 1,
       sliderEnd: 12,
       selectSubject: '仕入',
+      // 【Todo】ここはstateから参照すること
       subjectItems: ['売上', '雑収入等', '仕入', '経費'],
       barChartData: undefined,
       pieChartData: undefined,
@@ -189,11 +190,12 @@ export default defineComponent({
       // チャートデータ作成用のデータ整形
       // *********************************************************************
 
-      // 対象日付
-      const targetDay = Array.from(
+      // 対象月(xxxx年-xx月)
+      const targetMonth = Array.from(
         new Set(
           shapingData.map((data) => {
-            return data.day
+            // 「yyyy-mm-dd」型式の日付文字列「-dd」を削除
+            return data.day.substring(0, 7)
           })
         )
       ).sort()
@@ -213,6 +215,7 @@ export default defineComponent({
               return shapingDataInfoIdArray.includes(info.id)
             })
             .map((val) => {
+              // 【Todo】ここで各項目の色コードも一緒に返す
               return {
                 id: val.id,
                 name: val.name,
@@ -227,13 +230,13 @@ export default defineComponent({
       const chartData = targetClientsAndCosts.map((item) => {
         const chartLabel = item.name
 
-        const chartData = targetDay.map((day) => {
+        const chartData = targetMonth.map((month) => {
           const shapingTargetData = shapingData.filter((data) => {
             return data.cid === item.id
           })
           const targetCost = shapingTargetData
             .filter((data) => {
-              return data.day === day
+              return data.day.substring(0, 7) === month
             })
             .map((val) => {
               return val.pay
@@ -244,10 +247,6 @@ export default defineComponent({
                   (pVal: number, cVal: number): number => pVal + cVal
                 )
               : 0
-          // console.log('shapingTargetData', shapingTargetData)
-          // console.log('targetCost', targetCost)
-          // console.log('cost', cost)
-          console.log(globalState.workRecordsManagement.value)
           return cost
         })
 
@@ -257,6 +256,7 @@ export default defineComponent({
           Math.random() * 256
         )},0.5)`
 
+        // 【Todo】「backgroundColor」はmapループの「item」から項目「color」を参照すればOK
         return {
           label: chartLabel,
           data: chartData,
@@ -265,7 +265,7 @@ export default defineComponent({
       })
 
       const barChartData = {
-        labels: targetDay,
+        labels: targetMonth,
         datasets: chartData.concat(),
       }
 
@@ -297,7 +297,7 @@ export default defineComponent({
 
       // ★動作確認用
       console.log('shapingData', shapingData)
-      console.log('targetDay', targetDay)
+      console.log('targetMonth', targetMonth)
       console.log('targetClientsAndCosts', targetClientsAndCosts)
       console.log('barChartData', barChartData)
       console.log('pieChartData', pieChartData)

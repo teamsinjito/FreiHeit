@@ -25,7 +25,7 @@
             <v-col cols="12">
               <v-text-field
                 v-model="inputPay"
-                class="font-weight-bold"
+                class="font-weight-bol"
                 label="金額"
                 required
                 :rules="payRules"
@@ -298,6 +298,7 @@ export default defineComponent({
           day: state.inputYear + '-' + state.inputMonth + '-' + state.inputDay,
           cid: state.inputClientAndCost,
           note: state.inputNote,
+          update: new Date().toLocaleString('ja'),
         },
         state.checkbox
       )

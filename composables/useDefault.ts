@@ -54,6 +54,7 @@ const createGlobalState = (userId: string) => {
         day: '',
         cid: '',
         note: '',
+        update: '',
       },
     ],
 
@@ -65,6 +66,7 @@ const createGlobalState = (userId: string) => {
         groupname: '',
         requireflg: 0,
         sortid: 0,
+        payflg: 0,
       },
     ],
 
@@ -75,6 +77,7 @@ const createGlobalState = (userId: string) => {
         name: '',
         wid: '',
         iflg: 0,
+        color: '',
       },
     ],
     // 現在の会計年度
@@ -243,6 +246,7 @@ const createGlobalState = (userId: string) => {
           row.day = ary.day
           row.cid = ary.cid
           row.note = ary.note
+          row.update = ary.update
 
           // ソート
           globalState.workRecordsManagement.sort((n1, n2) => {
@@ -333,6 +337,7 @@ const createGlobalState = (userId: string) => {
           )[0]
 
           row.name = ary.name
+          row.color = ary.color
 
           if (ary.iflg === 1) {
             console.log('取引先更新：成功!')

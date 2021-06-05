@@ -9,9 +9,9 @@
     <v-card flat rounded="0" class="mb-2 py-5">
       <v-card-text>
         <v-row
-          ><v-col cols="12" md="4">
-            <v-expansion-panels focusable multiple>
-              <v-expansion-panel>
+          ><v-expansion-panels v-model="panel" focusable multiple>
+            <v-col cols="12" md="4">
+              <v-expansion-panel :key="0">
                 <v-expansion-panel-header color="primary" class="white--text"
                   >アカウント情報 </v-expansion-panel-header
                 ><v-expansion-panel-content class="pt-5">
@@ -74,12 +74,11 @@
                         </th>
                       </tr>
                     </template>
-                  </v-data-table> </v-expansion-panel-content></v-expansion-panel
-            ></v-expansion-panels>
-          </v-col>
-          <v-col cols="12" md="8">
-            <v-expansion-panels focusable multiple>
-              <v-expansion-panel>
+                  </v-data-table> </v-expansion-panel-content
+              ></v-expansion-panel>
+            </v-col>
+            <v-col cols="12" md="8">
+              <v-expansion-panel :key="1">
                 <v-expansion-panel-header color="primary" class="white--text"
                   >取引登録履歴 </v-expansion-panel-header
                 ><v-expansion-panel-content
@@ -140,7 +139,7 @@
                               <span
                                 class="text-sm-caption"
                                 style="font-size: 0.4rem"
-                                >2021/05/12 21:39:54 | EDIT</span
+                                >{{ item.update }} | EDIT</span
                               >
                             </v-col>
                           </v-row>
@@ -150,8 +149,8 @@
                   </v-timeline>
                 </v-expansion-panel-content></v-expansion-panel
               >
-            </v-expansion-panels>
-          </v-col>
+            </v-col>
+          </v-expansion-panels>
         </v-row>
       </v-card-text></v-card
     >
@@ -178,12 +177,14 @@ export default defineComponent({
         pic: string
         email: string
       }
+      panel: number[]
     }>({
       authUser: {
         name: '名無し',
         pic: 'mdi-account-settings',
         email: 'none-email@email.com',
       },
+      panel: [0, 1],
     })
     onBeforeMount(() => {
       state.authUser.name = context.root.$store.$auth.user.name as string
@@ -192,7 +193,16 @@ export default defineComponent({
     })
 
     const filterItemWithCreatedAt = () => {
-      return userState.workRecordsManagement.value
+      const copy = userState.workRecordsManagement.value.concat()
+      return copy.sort((n1, n2) => {
+        if (n1.update > n2.update) {
+          return -1
+        }
+        if (n1.update < n2.update) {
+          return 1
+        }
+        return 0
+      })
     }
     const getSubjectName = (m: string) => {
       return userState.subjectsInfo.value.filter((s) => s.id === m)[0].name

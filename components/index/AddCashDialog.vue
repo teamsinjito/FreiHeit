@@ -48,6 +48,7 @@ export default defineComponent({
         day: '',
         cid: '',
         note: '',
+        update: '',
       },
     })
     const dialogOpenClose = (v: boolean) => {

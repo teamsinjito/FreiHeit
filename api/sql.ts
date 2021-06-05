@@ -26,7 +26,8 @@ export const sql = {
     rm.subject_id as sid,
     to_char(rm.register_date::timestamp with time zone, 'YYYY-MM-DD'::text) as day,
     rm.client_or_cost_id as cid,
-    rm.note
+    rm.note,
+    to_char(rm.updated_at, 'YYYY年MM月DD日 HH24:MI:SS') as update
     from records_managements as rm 
     inner join works as w on rm.work_id = w.id
     where w.id = $1 and rm.register_date BETWEEN $2 AND $3
@@ -34,10 +35,10 @@ export const sql = {
   },
   subjectsInfo: {
     query:
-      'select s.id,s.name,sg.name as groupname,s.require_flg as requireflg,s.sort_id as sortid from subjects s inner join subjects_groups sg on sg.id = s.group_id order by s.sort_id;',
+      'select s.id,s.name,sg.name as groupname,s.require_flg as requireflg,s.sort_id as sortid,sg.payflg from subjects s inner join subjects_groups sg on sg.id = s.group_id order by s.sort_id;',
   },
   clientsAndCostsInfo: {
-    query: `select id,name,item_flg as iflg from clients_and_costs where work_id = $1 ;`,
+    query: `select id,name,item_flg as iflg,color from clients_and_costs where work_id = $1 ;`,
   },
   tabsInfo: {
     query: 'select tab,content from tabs_info order by tab;',
@@ -50,9 +51,10 @@ export const sql = {
       subject_id,
       register_date,
       client_or_cost_id,
-      note
+      note,
+      updated_at
     ) 
-    values($1,$2,$3,$4,$5,$6,$7);`,
+    values($1,$2,$3,$4,$5,$6,$7,$8);`,
   },
 
   updateRecordManagement: {
@@ -61,8 +63,9 @@ export const sql = {
               subject_id = $2,
               register_date = $3,
               client_or_cost_id = $4,
-              note = $5
-            where id = $6 ;`,
+              note = $5,
+              updated_at = $6
+            where id = $7 ;`,
   },
 
   deleteRecordManagement: {
@@ -74,12 +77,14 @@ export const sql = {
       id,
       name,
       work_id,
-      item_flg
+      item_flg,
+      color
     ) 
-    values($1,$2,$3,$4);`,
+    values($1,$2,$3,$4,$5);`,
   },
   updateClientCost: {
-    query: 'update clients_and_costs set name = $1 where id = $2 ;',
+    query:
+      'update clients_and_costs set name = $1 , color = $2 where id = $3 ;',
   },
   deleteClientCost: {
     query: 'delete from clients_and_costs where id = $1 ;',

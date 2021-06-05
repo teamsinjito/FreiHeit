@@ -95,6 +95,7 @@ app.post(connectPathUsers, async (req: Request, res) => {
         day: '',
         cid: '',
         note: '',
+        update: '',
       },
     ],
 
@@ -106,6 +107,7 @@ app.post(connectPathUsers, async (req: Request, res) => {
         groupname: '',
         requireflg: 0,
         sortid: 0,
+        payflg: 0,
       },
     ],
     // 取引先および固定経費
@@ -115,6 +117,7 @@ app.post(connectPathUsers, async (req: Request, res) => {
         name: '',
         wid: '',
         iflg: 0,
+        color: '',
       },
     ],
     // 現在の会計期間
@@ -298,6 +301,7 @@ app.post(connectPathInsertRecordsManagement, async (req, res) => {
         input.day,
         input.cid,
         input.note,
+        input.update,
       ])
       .then(() => {
         console.log('DB:insert complete')
@@ -331,6 +335,7 @@ app.post(connectPathUpdateRecordsManagement, async (req, res) => {
         input.day,
         input.cid,
         input.note,
+        input.update,
         input.id,
       ])
       .then(() => {
@@ -387,6 +392,7 @@ app.post(connectPathInsertClientCost, async (req, res) => {
         input.name,
         input.wid,
         input.iflg,
+        input.color,
       ])
       .then(() => {
         console.log('DB:insert complete')
@@ -413,7 +419,7 @@ app.post(connectPathUpdateClientCost, async (req, res) => {
 
   try {
     await client
-      .query(sql.updateClientCost.query, [input.name, input.id])
+      .query(sql.updateClientCost.query, [input.name, input.color, input.id])
       .then(() => {
         console.log('DB:update complete')
         res.json(true)
@@ -500,6 +506,7 @@ app.post(connectPathChangeWorksRecordsManagement, async (req, res) => {
         day: '',
         cid: '',
         note: '',
+        update: '',
       },
     ],
     clientsAndCostsInfo: [
@@ -508,6 +515,7 @@ app.post(connectPathChangeWorksRecordsManagement, async (req, res) => {
         name: '',
         wid: '',
         iflg: 0,
+        color: '',
       },
     ],
   }

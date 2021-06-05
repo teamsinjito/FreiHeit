@@ -121,6 +121,7 @@
                         {{
                           userState.currentSysYear.value.num + month.tab
                         }}：集計表
+                        <v-spacer></v-spacer>
                         <v-switch v-model="switchFlg" class="pl-3"></v-switch>
                       </v-card-title>
 
@@ -132,6 +133,9 @@
                           cols="12"
                           class="py-0"
                         >
+                          <v-divider
+                            v-if="total.name === carryOverName"
+                          ></v-divider>
                           <v-list-item>
                             <v-list-item-content
                               class="text-caption font-weight-bold"
@@ -139,13 +143,31 @@
                               >{{ total.name }}:</v-list-item-content
                             >
                             <v-list-item-content
+                              v-if="
+                                total.pay > 0 && total.name === carryOverName
+                              "
+                              class="align-end font-weight-bold success--text"
+                              style="font-size: 0.8rem"
+                            >
+                              {{ total.pay.toLocaleString() }} 円
+                            </v-list-item-content>
+                            <v-list-item-content
+                              v-else-if="
+                                total.pay < 0 && total.name === carryOverName
+                              "
+                              class="align-end font-weight-bold error--text"
+                              style="font-size: 0.8rem"
+                            >
+                              {{ total.pay.toLocaleString() }} 円
+                            </v-list-item-content>
+                            <v-list-item-content
+                              v-else
                               class="align-end font-weight-bold"
                               style="font-size: 0.8rem"
                             >
                               {{ total.pay.toLocaleString() }} 円
                             </v-list-item-content>
                           </v-list-item>
-                          <v-divider></v-divider>
                         </v-col>
                       </v-list>
                     </v-card>
@@ -175,25 +197,18 @@ export default defineComponent({
 
   setup() {
     const userState = useGlobalState()
+    const carryOverName = '繰越金'
     const state = reactive<{
       tab: string
       singleExpand: boolean
-      totals: [
-        {
-          name: string
-          pay: number
-        }
-      ]
+
+      carryOver: number
       switchFlg: boolean
     }>({
       tab: '',
       singleExpand: true,
-      totals: [
-        {
-          name: '',
-          pay: 0,
-        },
-      ],
+
+      carryOver: 0,
       switchFlg: true,
     })
     const headers = [
@@ -211,6 +226,7 @@ export default defineComponent({
 
     const filterAndMergeItemWithMonth = (m: string) => {
       const totals: { name: string; pay: number }[] = []
+      let carryOver: number = 0
       userState.subjectsInfo.value.forEach((element) => {
         // 月ごとにフィルター
         const a = filterItemWithMonth(m)
@@ -225,14 +241,22 @@ export default defineComponent({
 
         if (sum !== 0 || element.requireflg === 1) {
           totals.push({ name: element.name, pay: sum })
+          carryOver = carryOver + sum * element.payflg
         }
       })
-
+      totals.push({ name: carryOverName, pay: carryOver })
+      // totals.forEach((element) => {
+      //   const f = userState.subjectsInfo.value.filter((r) =>
+      //     r.name.includes(element.name)
+      //   )[0]
+      //   state.carryOver = state.carryOver + element.pay * f.payflg
+      // })
       return totals
     }
 
     return {
       ...toRefs(state),
+      carryOverName,
       headers,
       getSubjectName,
       userState,

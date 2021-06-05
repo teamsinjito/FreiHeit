@@ -61,6 +61,7 @@ export default defineComponent({
         wid: '',
         name: '',
         iflg: 0,
+        color: '',
       },
     })
     const dialogOpenClose = (v: boolean) => {

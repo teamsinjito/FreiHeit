@@ -20,6 +20,7 @@ export interface RecordsManagement {
   day: string
   cid: string
   note: string
+  update: string
 }
 
 // ユーザ毎の取引先および固定経費一覧
@@ -28,6 +29,7 @@ export interface ClientsAndCosts {
   name: string
   wid: string
   iflg: number
+  color: string
 }
 
 // 勘定科目一覧
@@ -37,6 +39,7 @@ export interface Subjects {
   groupname: string
   requireflg: number
   sortid: number
+  payflg: number
 }
 
 export interface StateInterface {

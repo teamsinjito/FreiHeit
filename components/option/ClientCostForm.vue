@@ -27,8 +27,34 @@
               required
               autofocus
               :rules="nameRules"
-            ></v-text-field></v-row
-        ></v-container>
+            ></v-text-field
+          ></v-row>
+          <br />
+          <v-card-subtitle class="px-0"
+            >ラベルを選択してください
+            <v-btn icon class="ml-2" @click="show = !show">
+              <v-icon>{{
+                show ? 'mdi-chevron-up' : 'mdi-chevron-down'
+              }}</v-icon>
+            </v-btn>
+          </v-card-subtitle>
+
+          <v-expand-transition>
+            <v-row v-if="show">
+              <v-color-picker
+                v-model="inputColor"
+                dot-size="25"
+                mode="hexa"
+                hide-canvas
+                hide-sliders
+                hide-inputs
+                hide-mode-switch
+                show-swatches
+                width="100%"
+              ></v-color-picker>
+            </v-row>
+          </v-expand-transition>
+        </v-container>
         <small v-if="continueFlg">
           <v-checkbox v-model="checkbox">
             <template #label>
@@ -98,15 +124,19 @@ export default defineComponent({
     context
   ) {
     const state = reactive<{
+      show: boolean
       valid: boolean
       checkbox: boolean
       inputClientCost: string
+      inputColor: string
       id: string
     }>({
+      show: false,
       valid: false,
       checkbox: props.continueFlg,
       id: props.defaultRecords.id,
       inputClientCost: props.defaultRecords.name,
+      inputColor: props.defaultRecords.color || '#F44336FF',
     })
 
     const userState = useGlobalState()
@@ -124,7 +154,6 @@ export default defineComponent({
         console.log('validation error!')
         return
       }
-
       // insert or update
       context.emit(
         'exec',
@@ -133,6 +162,7 @@ export default defineComponent({
           wid: userState.workInfo.value[0].id,
           name: state.inputClientCost,
           iflg: props.iflg,
+          color: state.inputColor,
         },
         state.checkbox
       )

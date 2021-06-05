@@ -1,5 +1,5 @@
 <template>
-  <div class="my-chart-area">
+  <div id="barChart" class="my-chart-area">
     <canvas ref="canvasRef" />
   </div>
 </template>

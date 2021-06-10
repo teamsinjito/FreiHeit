@@ -215,10 +215,10 @@ export default defineComponent({
               return shapingDataInfoIdArray.includes(info.id)
             })
             .map((val) => {
-              // 【Todo】ここで各項目の色コードも一緒に返す
               return {
                 id: val.id,
                 name: val.name,
+                color: val.color,
               }
             })
         )
@@ -250,13 +250,8 @@ export default defineComponent({
           return cost
         })
 
-        const chartBackgroundColor = `rgba(${Math.floor(
-          Math.random() * 256
-        )},${Math.floor(Math.random() * 256)},${Math.floor(
-          Math.random() * 256
-        )},0.5)`
+        const chartBackgroundColor = item.color
 
-        // 【Todo】「backgroundColor」はmapループの「item」から項目「color」を参照すればOK
         return {
           label: chartLabel,
           data: chartData,

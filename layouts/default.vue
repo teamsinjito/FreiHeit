@@ -1,5 +1,5 @@
 <template>
-  <v-app v-if="display">
+  <v-app v-if="userState.displayShow.value">
     <!-- サイドバー -->
     <nav-drawer
       :mini="mini"

@@ -2,7 +2,7 @@
   <!-- ヘッダー項目 -->
   <v-toolbar flat>
     <v-toolbar-title class="text-sm-subtitle-1 text-caption font-weight-black">
-      項目別集計表
+      項目別明細表
     </v-toolbar-title>
     <v-divider class="mx-4" inset vertical></v-divider>
     <v-spacer></v-spacer>
@@ -14,7 +14,7 @@
 </template>
 <script lang="ts">
 import { defineComponent } from '@vue/composition-api'
-import { Totals } from '@/composables/interface'
+import { Details } from '@/composables/interface'
 import pdfMake from 'pdfmake/build/pdfmake'
 import '@/static/vfs_fonts.js'
 export default defineComponent({
@@ -27,8 +27,12 @@ export default defineComponent({
       type: String,
       required: true,
     },
+    clients: {
+      type: String,
+      required: true,
+    },
   },
-  setup(props: { records: Totals[]; subject: string }) {
+  setup(props: { records: Details[]; subject: string; clients: string }) {
     const print = () => {
       pdfMake.fonts = {
         GenShin: {
@@ -49,20 +53,21 @@ export default defineComponent({
           {
             alignment: 'justify',
             columns: [
-              { text: '項目別集計表', style: { color: 'black', fontSize: 10 } },
+              { text: '項目別明細表', style: { color: 'black', fontSize: 10 } },
               {
-                text: props.subject,
+                text: props.subject + '  ' + props.clients,
                 style: { color: 'black', fontSize: 8, alignment: 'right' },
               },
             ],
           },
+
           {
             style: { color: 'black', fontSize: 8 },
             // layout: 'lightHorizontalLines',
             table: {
               headerRows: 1,
               widths: [
-                'auto',
+                '*',
                 '*',
                 '*',
                 '*',
@@ -146,7 +151,7 @@ export default defineComponent({
                   },
                   {
                     fillColor: '#e4effa',
-                    text: '合計',
+                    text: '',
                     color: '#000000',
                   },
                 ],
@@ -158,7 +163,6 @@ export default defineComponent({
           font: defaultStyle,
         },
       }
-
       props.records.forEach((e, index) => {
         let fillColorCode = '#ffffff'
         if (index === props.records.length - 1) {
@@ -179,7 +183,6 @@ export default defineComponent({
           )
         })
       })
-
       // pdfMakeでのPDF出力
       pdfMake.createPdf(docDefinition).download()
     }

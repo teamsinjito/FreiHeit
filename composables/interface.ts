@@ -42,6 +42,41 @@ export interface Subjects {
   payflg: number
 }
 
+// 項目別集計表
+export interface Totals {
+  cName: string
+  jan: string
+  feb: string
+  mar: string
+  apr: string
+  may: string
+  jun: string
+  jul: string
+  aug: string
+  sep: string
+  oct: string
+  nov: string
+  dec: string
+  sum: string
+}
+// 項目別明細表
+export interface Details {
+  cNameS: string
+  jan: string
+  feb: string
+  mar: string
+  apr: string
+  may: string
+  jun: string
+  jul: string
+  aug: string
+  sep: string
+  oct: string
+  nov: string
+  dec: string
+  cNameE: string
+}
+
 export interface StateInterface {
   workInfo: Works[] // ユーザ情報
   workRecordsManagement: RecordsManagement[] // 取引管理

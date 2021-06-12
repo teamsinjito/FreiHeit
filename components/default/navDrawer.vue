@@ -95,6 +95,11 @@ export default defineComponent({
         to: '/totals',
       },
       {
+        icon: 'mdi-table-multiple',
+        title: '項目別明細表',
+        to: '/details',
+      },
+      {
         icon: 'mdi-chart-bar',
         title: '収支レポート',
         to: '/chart',

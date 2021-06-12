@@ -4,14 +4,15 @@
     width="100%"
     color="transparent"
     class="overflow-hidden"
-    ><totals-header-bar
+    ><details-header-bar
       :records="records"
       :subject="selectSubject"
-    ></totals-header-bar
+      :clients="selectClientsAndCostsName"
+    ></details-header-bar
     ><v-divider></v-divider>
     <v-card flat rounded="0" class="mb-2 py-5">
       <v-row class="px-2">
-        <v-col offset-sm="10">
+        <v-col offset-sm="8">
           <v-select
             v-model="selectSubject"
             :items="subjectItems"
@@ -20,9 +21,24 @@
             @change="changeSubject()"
           >
             <template #label>
-              <span class="text-caption">項目を選択</span>
+              <span class="text-caption">勘定科目を選択</span>
             </template>
           </v-select>
+        </v-col>
+        <v-col>
+          <v-autocomplete
+            v-model="selectClientsAndCosts"
+            :items="clientsAndCosts"
+            item-value="id"
+            item-text="name"
+            dense
+            class="mt-6 text-caption"
+            @change="changeSubject()"
+          >
+            <template #label>
+              <span class="text-caption">取引先および固定経費を選択</span>
+            </template>
+          </v-autocomplete>
         </v-col>
       </v-row>
 
@@ -44,23 +60,76 @@ import {
   toRefs,
 } from '@vue/composition-api'
 import { useGlobalState } from '@/composables/useDefault'
-import { Totals } from '@/composables/interface'
-import TotalsHeaderBar from '@/components/totals/TotalsHeaderBar.vue'
+import DetailsHeaderBar from '~/components/totals/DetailsHeaderBar.vue'
 
 export default defineComponent({
-  components: { TotalsHeaderBar },
+  components: { DetailsHeaderBar },
   setup() {
     const useState = useGlobalState()
+    const date = [
+      { id: '1', value: '01' },
+      { id: '2', value: '02' },
+      { id: '3', value: '03' },
+      { id: '4', value: '04' },
+      { id: '5', value: '05' },
+      { id: '6', value: '06' },
+      { id: '7', value: '07' },
+      { id: '8', value: '08' },
+      { id: '9', value: '09' },
+      { id: '10', value: '10' },
+      { id: '11', value: '11' },
+      { id: '12', value: '12' },
+      { id: '13', value: '13' },
+      { id: '14', value: '14' },
+      { id: '15', value: '15' },
+      { id: '16', value: '16' },
+      { id: '17', value: '17' },
+      { id: '18', value: '18' },
+      { id: '19', value: '19' },
+      { id: '20', value: '20' },
+      { id: '21', value: '21' },
+      { id: '22', value: '22' },
+      { id: '23', value: '23' },
+      { id: '24', value: '24' },
+      { id: '25', value: '25' },
+      { id: '26', value: '26' },
+      { id: '27', value: '27' },
+      { id: '28', value: '28' },
+      { id: '29', value: '29' },
+      { id: '30', value: '30' },
+      { id: '31', value: '31' },
+    ]
     const state = reactive<{
       selectSubject: string
       subjectItems: string[]
-      records: Totals[]
+      selectClientsAndCosts: string
+      selectClientsAndCostsName: string
+      clientsAndCosts: { id: string; name: string }[]
+      records: {
+        cNameS: string
+        jan: string
+        feb: string
+        mar: string
+        apr: string
+        may: string
+        jun: string
+        jul: string
+        aug: string
+        sep: string
+        oct: string
+        nov: string
+        dec: string
+        cNameE: string
+      }[]
     }>({
       selectSubject: '仕入',
       subjectItems: [],
+      selectClientsAndCosts: '',
+      selectClientsAndCostsName: '',
+      clientsAndCosts: [{ id: '', name: '' }],
       records: [
         {
-          cName: '',
+          cNameS: '',
           jan: '0',
           feb: '0',
           mar: '0',
@@ -73,11 +142,10 @@ export default defineComponent({
           oct: '0',
           nov: '0',
           dec: '0',
-          sum: '0',
+          cNameE: '',
         },
       ],
     })
-
     // 勘定科目セット
     const setSubjects = () => {
       const items = useState.subjectsInfo.value.reduce((ary: string[], g) => {
@@ -87,6 +155,14 @@ export default defineComponent({
       state.subjectItems = [...new Set(items)]
       console.log(state.subjectItems)
     }
+    // 取引先および固定経費セット
+    const setClientsAndCosts = () => {
+      const items = useState.clientsAndCostsInfo.value.map((i) => {
+        return { id: i.id, name: i.name }
+      })
+      state.clientsAndCosts = [...new Set(items)]
+      state.selectClientsAndCosts = items[0].id
+    }
 
     // データ整形処理
     const getFilteringData = () => {
@@ -94,6 +170,13 @@ export default defineComponent({
       // 選択している勘定科目でフィルタリング
       const filterRecordsManagements = useState.workRecordsManagement.value.filter(
         (rm) => {
+          const cl = useState.clientsAndCostsInfo.value
+            .filter((s) => {
+              return s.id === state.selectClientsAndCosts
+            })
+            .map((fs) => {
+              return fs.id
+            })
           const subjects = useState.subjectsInfo.value
             .filter((s) => {
               return s.groupname === state.selectSubject
@@ -102,15 +185,16 @@ export default defineComponent({
               return fs.id
             })
 
-          return subjects.includes(rm.sid)
+          return cl.includes(rm.cid) && subjects.includes(rm.sid)
         }
       )
+      console.log(filterRecordsManagements)
       // 取引先または固定経費毎に月毎の金額を算出
-      useState.clientsAndCostsInfo.value.forEach((e) => {
+      date.forEach((d) => {
         // 取引先または固定経費毎にフィルタリング
         const filterByClientsAndCosts = filterRecordsManagements
           .filter((r) => {
-            return r.cid === e.id
+            return r.day.slice(8, 10) === d.value
           })
           .map((i) => {
             return {
@@ -118,39 +202,28 @@ export default defineComponent({
               month: Number(i.day.slice(5, 7)),
             }
           })
-        if (filterByClientsAndCosts.length > 0) {
-          state.records.push({
-            cName: e.name,
-            jan: sumPerMonth(filterByClientsAndCosts, 1),
-            feb: sumPerMonth(filterByClientsAndCosts, 2),
-            mar: sumPerMonth(filterByClientsAndCosts, 3),
-            apr: sumPerMonth(filterByClientsAndCosts, 4),
-            may: sumPerMonth(filterByClientsAndCosts, 5),
-            jun: sumPerMonth(filterByClientsAndCosts, 6),
-            jul: sumPerMonth(filterByClientsAndCosts, 7),
-            aug: sumPerMonth(filterByClientsAndCosts, 8),
-            sep: sumPerMonth(filterByClientsAndCosts, 9),
-            oct: sumPerMonth(filterByClientsAndCosts, 10),
-            nov: sumPerMonth(filterByClientsAndCosts, 11),
-            dec: sumPerMonth(filterByClientsAndCosts, 12),
-            sum: filterByClientsAndCosts
-              .reduce((sum, r) => {
-                return sum + r.pay
-              }, 0)
-              .toLocaleString(),
-          })
-        }
+
+        state.records.push({
+          cNameS: d.id + '日',
+          jan: sumPerMonth(filterByClientsAndCosts, 1),
+          feb: sumPerMonth(filterByClientsAndCosts, 2),
+          mar: sumPerMonth(filterByClientsAndCosts, 3),
+          apr: sumPerMonth(filterByClientsAndCosts, 4),
+          may: sumPerMonth(filterByClientsAndCosts, 5),
+          jun: sumPerMonth(filterByClientsAndCosts, 6),
+          jul: sumPerMonth(filterByClientsAndCosts, 7),
+          aug: sumPerMonth(filterByClientsAndCosts, 8),
+          sep: sumPerMonth(filterByClientsAndCosts, 9),
+          oct: sumPerMonth(filterByClientsAndCosts, 10),
+          nov: sumPerMonth(filterByClientsAndCosts, 11),
+          dec: sumPerMonth(filterByClientsAndCosts, 12),
+          cNameE: d.id + '日',
+        })
       })
-      console.log(state.records)
-      // 金額順に並び替え
-      state.records.sort(function (a, b) {
-        return (
-          Number(b.sum.replaceAll(',', '')) - Number(a.sum.replaceAll(',', ''))
-        )
-      })
+
       // 合計行の算出
       state.records.push({
-        cName: '合計',
+        cNameS: '合計',
         jan: state.records
           .reduce((acc, r): number => {
             return acc + Number(r.jan.replaceAll(',', ''))
@@ -211,16 +284,14 @@ export default defineComponent({
             return acc + Number(r.dec.replaceAll(',', ''))
           }, 0)
           .toLocaleString(),
-        sum: state.records
-          .reduce((acc, r) => {
-            return acc + Number(r.sum.replaceAll(',', ''))
-          }, 0)
-          .toLocaleString(),
+        cNameE: '合計',
       })
       console.log(state.records)
     }
     onMounted(() => {
       setSubjects()
+      setClientsAndCosts()
+      state.selectClientsAndCostsName = state.clientsAndCosts[0].name
       getFilteringData()
     })
 
@@ -239,7 +310,7 @@ export default defineComponent({
     const columns = [
       {
         label: '',
-        field: 'cName',
+        field: 'cNameS',
         type: 'string',
         tdClass: 'text-caption text-center',
         sortable: false,
@@ -341,15 +412,20 @@ export default defineComponent({
         sortable: false,
       },
       {
-        label: '合計',
-        field: 'sum',
+        label: '',
+        field: 'cNameE',
         type: 'string',
-        thClass: 'text-subtitle-2 text-center',
         tdClass: 'text-caption text-center',
         sortable: false,
       },
     ]
     const changeSubject = () => {
+      state.clientsAndCosts.forEach((clients) => {
+        if (state.selectClientsAndCosts === clients.id) {
+          state.selectClientsAndCostsName = clients.name
+          console.log(state.selectClientsAndCostsName)
+        }
+      })
       getFilteringData()
     }
     return { columns, changeSubject, ...toRefs(state) }

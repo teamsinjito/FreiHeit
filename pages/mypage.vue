@@ -87,7 +87,7 @@
                 >
                   <v-timeline dense>
                     <v-timeline-item
-                      v-for="item in filterItemWithCreatedAt()"
+                      v-for="item in timeLineDataPerPage"
                       :key="item.id"
                       small
                     >
@@ -147,13 +147,17 @@
                       </v-card>
                     </v-timeline-item>
                   </v-timeline>
-                </v-expansion-panel-content></v-expansion-panel
-              >
+                  <v-pagination
+                    v-model="page"
+                    :length="maxLength"
+                    :total-visible="7"
+                    @input="changePage()"
+                  ></v-pagination> </v-expansion-panel-content
+              ></v-expansion-panel>
             </v-col>
           </v-expansion-panels>
-        </v-row>
-      </v-card-text></v-card
-    >
+        </v-row> </v-card-text
+    ></v-card>
   </v-sheet>
 </template>
 <script lang="ts">
@@ -162,22 +166,29 @@ import {
   reactive,
   onBeforeMount,
   toRefs,
+  onMounted,
 } from '@vue/composition-api'
 import { useGlobalState } from '../composables/useDefault'
+import { RecordsManagement } from '../composables/interface'
 import AddMyOffice from '~/components/mypage/AddMyOffice.vue'
 import UpdateMyOffice from '~/components/mypage/UpdateMyOffice.vue'
 import MyPageHeaderBar from '~/components/mypage/MyPageHeaderBar.vue'
 export default defineComponent({
   components: { MyPageHeaderBar, AddMyOffice, UpdateMyOffice },
-  setup(props, context) {
+  setup(prop, context) {
     const userState = useGlobalState()
+    const pagePerCount = 20
     const state = reactive<{
       authUser: {
         name: string
         pic: string
         email: string
       }
+      maxLength: number
       panel: number[]
+      page: number
+      timeLineData: RecordsManagement[]
+      timeLineDataPerPage: RecordsManagement[]
     }>({
       authUser: {
         name: '名無し',
@@ -185,6 +196,12 @@ export default defineComponent({
         email: 'none-email@email.com',
       },
       panel: [0, 1],
+      page: 1,
+      maxLength: Math.ceil(
+        userState.workRecordsManagement.value.length / pagePerCount
+      ),
+      timeLineData: [],
+      timeLineDataPerPage: [],
     })
     onBeforeMount(() => {
       state.authUser.name = context.root.$store.$auth.user.name as string
@@ -192,9 +209,14 @@ export default defineComponent({
       state.authUser.email = context.root.$store.$auth.user.email as string
     })
 
+    onMounted(() => {
+      filterItemWithCreatedAt()
+      console.log('timeLineData', state.timeLineData)
+      pagingTimeLineData(1)
+    })
     const filterItemWithCreatedAt = () => {
-      const copy = userState.workRecordsManagement.value.concat()
-      return copy.sort((n1, n2) => {
+      state.timeLineData = userState.workRecordsManagement.value.concat()
+      return state.timeLineData.sort((n1, n2) => {
         if (n1.update > n2.update) {
           return -1
         }
@@ -204,14 +226,27 @@ export default defineComponent({
         return 0
       })
     }
+    const pagingTimeLineData = (page: number) => {
+      state.timeLineDataPerPage = state.timeLineData
+        .slice(
+          (page - 1) * pagePerCount,
+          (page - 1) * pagePerCount + pagePerCount
+        )
+        .concat()
+    }
     const getSubjectName = (m: string) => {
       return userState.subjectsInfo.value.filter((s) => s.id === m)[0].name
+    }
+    const changePage = () => {
+      console.log(state.page)
+      pagingTimeLineData(state.page)
     }
     return {
       ...toRefs(state),
       userState,
       filterItemWithCreatedAt,
       getSubjectName,
+      changePage,
     }
   },
 })

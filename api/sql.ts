@@ -27,7 +27,7 @@ export const sql = {
     to_char(rm.register_date::timestamp with time zone, 'YYYY-MM-DD'::text) as day,
     rm.client_or_cost_id as cid,
     rm.note,
-    to_char(rm.updated_at, 'YYYY年MM月DD日 HH24:MI:SS') as update
+    to_char(rm.updated_at, 'YYYY/MM/DD HH24:MI:SS') as update
     from records_managements as rm 
     inner join works as w on rm.work_id = w.id
     where w.id = $1 and rm.register_date BETWEEN $2 AND $3

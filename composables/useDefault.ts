@@ -103,6 +103,12 @@ const createGlobalState = (userId: string) => {
     overlayShow: false,
   })
 
+  const displayState = reactive<{
+    displayShow: boolean
+  }>({
+    displayShow: false,
+  })
+
   // グローバルstateにセット
   const setGrobalStateCall = async (authId: string) => {
     await axios
@@ -117,6 +123,7 @@ const createGlobalState = (userId: string) => {
           globalState.subjectsInfo = data.data.subjectsInfo
           globalState.clientsAndCostsInfo = data.data.clientsAndCostsInfo
           globalState.tabsInfo = data.data.tabsInfo
+          displayState.displayShow = true
           console.log('初期処理：成功!')
         } else {
           alert('初期処理に失敗しました。')
@@ -489,6 +496,7 @@ const createGlobalState = (userId: string) => {
   return {
     ...toRefs(globalState),
     ...toRefs(overlayState),
+    ...toRefs(displayState),
     setGrobalStateCall,
     insertMyOffice,
     updateMyOffice,

@@ -103,6 +103,7 @@
                             :color="item.color"
                             size="13"
                             class="mr-3"
+                            tile
                           ></v-avatar>
                           {{ item.name }}
                         </th>

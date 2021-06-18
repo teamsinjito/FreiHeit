@@ -23,8 +23,12 @@ export default defineComponent({
       type: Object,
       required: true,
     },
+    selectSubject: {
+      type: String,
+      required: true,
+    },
   },
-  setup(props: { pieData: pieType }) {
+  setup(props: { pieData: pieType; selectSubject: string }) {
     const state = reactive<{
       chart: Chart | undefined
     }>({
@@ -44,7 +48,7 @@ export default defineComponent({
         options: {
           title: {
             display: true,
-            text: '取引先別 収益の推移',
+            text: `${props.selectSubject}別 収益の推移`,
           },
           tooltips: {
             callbacks: {

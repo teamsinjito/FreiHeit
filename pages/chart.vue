@@ -95,10 +95,16 @@
                 <v-expansion-panel-content id="chartPanel" class="pt-5">
                   <v-row v-if="chartShow">
                     <v-col cols="12" sm="12" md="6">
-                      <bar-chart :bar-data="barChartData" />
+                      <bar-chart
+                        :bar-data="barChartData"
+                        :select-subject="selectSubject"
+                      />
                     </v-col>
                     <v-col cols="12" sm="12" md="6">
-                      <pie-chart :pie-data="pieChartData" />
+                      <pie-chart
+                        :pie-data="pieChartData"
+                        :select-subject="selectSubject"
+                      />
                     </v-col>
                   </v-row>
                 </v-expansion-panel-content>

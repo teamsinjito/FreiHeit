@@ -22,8 +22,12 @@ export default defineComponent({
       type: Object,
       required: true,
     },
+    selectSubject: {
+      type: String,
+      required: true,
+    },
   },
-  setup(props: { barData: barType }) {
+  setup(props: { barData: barType; selectSubject: string }) {
     const state = reactive<{
       chart: Chart | undefined
     }>({
@@ -41,9 +45,8 @@ export default defineComponent({
         options: {
           title: {
             display: true,
-            text: '取引先別 収益の推移',
+            text: `${props.selectSubject}別 収益の推移`,
             padding: 10,
-            fontSize: 20,
           },
           scales: {
             xAxes: [
@@ -92,6 +95,7 @@ export default defineComponent({
       (newBarData) => {
         if (state.chart) {
           state.chart.data = newBarData
+          state.chart.options.title?.text = `${props.selectSubject}別 収益の推移`
           state.chart.update()
         }
       }

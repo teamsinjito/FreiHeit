@@ -290,13 +290,6 @@ export default defineComponent({
         ],
       }
 
-      // ★動作確認用
-      console.log('shapingData', shapingData)
-      console.log('targetMonth', targetMonth)
-      console.log('targetClientsAndCosts', targetClientsAndCosts)
-      console.log('barChartData', barChartData)
-      console.log('pieChartData', pieChartData)
-
       // 作成したチャートデータをstateにセット
       state.barChartData = barChartData
       state.pieChartData = pieChartData

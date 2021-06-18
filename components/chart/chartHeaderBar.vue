@@ -16,32 +16,65 @@
 import { defineComponent } from '@vue/composition-api'
 // import { printPdf } from '@/composables/useChart'
 import { useGlobalState } from '@/composables/useDefault'
-import JsPDF from 'jspdf'
 import html2canvas from 'html2canvas'
-
+import pdfMake from 'pdfmake/build/pdfmake'
 export default defineComponent({
   setup() {
     const globalState = useGlobalState()
     const print = () => {
+      // スクロールを禁止にする関数
+      const disableScroll = (event) => {
+        event.preventDefault()
+      }
+
+      // オーバーレイ表示
       globalState.overlayText.value = 'pdf出力中...'
       globalState.overlayShow.value = true
-      // printPdf()
 
-      html2canvas(document.getElementById('chartPanel')).then((canvas) => {
-        // jspdfの初期化
-        const pdf = new JsPDF('l', 'px', 'a4')
-        const width = pdf.internal.pageSize.width
-        const height = pdf.internal.pageSize.height
+      // イベント設定
+      document.addEventListener('touchmove', disableScroll, { passive: false })
+      document.addEventListener('mousewheel', disableScroll, { passive: false })
 
-        // html2canvasで取得した要素をPDFに追加する処理
-        const dataURI = canvas.toDataURL()
-        pdf.addImage(dataURI, 'JPEG', 0, 0, width, height)
+      html2canvas(document.getElementById('barChart'))
+        .then((barCanvas) => {
+          html2canvas(document.getElementById('pieChart')).then((pieCanvas) => {
+            // PDF出力する内容の定義
+            const docDefinition = {
+              pageSize: 'A4',
+              pageOrientation: 'landscape',
+              content: [
+                {
+                  columns: [
+                    {
+                      image: barCanvas.toDataURL(),
+                      fit: [350, 350],
+                    },
+                    {
+                      image: pieCanvas.toDataURL(),
+                      fit: [350, 350],
+                    },
+                  ],
+                  columnGap: 0,
+                },
+              ],
+            }
 
-        // JsPDFでのPDF保存
-        pdf.save('sample.pdf')
-      })
+            // PDF出力
+            pdfMake.createPdf(docDefinition).download()
+          })
+        })
+        .finally(() => {
+          // オーバーレイ非表示
+          globalState.overlayShow.value = false
 
-      globalState.overlayShow.value = false
+          // イベント破棄
+          document.removeEventListener('touchmove', disableScroll, {
+            passive: false,
+          })
+          document.removeEventListener('mousewheel', disableScroll, {
+            passive: false,
+          })
+        })
     }
 
     return { print }

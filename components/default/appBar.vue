@@ -6,9 +6,35 @@
     <v-app-bar-title v-text="title"></v-app-bar-title>
     <v-spacer></v-spacer>
     <!-- ヘルプアイコン -->
-    <v-btn icon>
-      <v-icon>mdi-progress-question</v-icon>
-    </v-btn>
+    <v-dialog v-model="helpShow" width="500">
+      <template #activator="{ on, attrs }">
+        <v-btn icon v-bind="attrs" v-on="on">
+          <v-icon>mdi-progress-question</v-icon>
+        </v-btn>
+      </template>
+      <v-card>
+        <v-card-title class="text-h5 grey lighten-2">
+          格画面の説明
+        </v-card-title>
+        <v-carousel v-model="carousel" light hide-delimiter-background>
+          <v-carousel-item v-for="n in 5" :key="n">
+            <v-sheet height="100%" tile>
+              <v-row class="fill-height" align="center" justify="center">
+                <v-img height="250" src="/login_bg.png"></v-img>
+              </v-row>
+            </v-sheet>
+          </v-carousel-item>
+        </v-carousel>
+
+        <v-divider></v-divider>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="primary" text @click="helpShow = false"> 閉じる </v-btn>
+          <v-spacer></v-spacer>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <!-- 設定アイコン -->
     <v-menu offset-y :close-on-content-click="false">
       <template #activator="{ on, attrs }">
@@ -92,6 +118,8 @@ export default defineComponent({
         color: string
         view: boolean
       }
+      helpShow: boolean
+      carousel: number
     }>({
       authUser: {
         name: '名無し',
@@ -102,6 +130,8 @@ export default defineComponent({
         color: '',
         view: false,
       },
+      helpShow: false,
+      carousel: 0,
     })
     const userState = useGlobalState()
     const preYear = new Date().getFullYear() - 1

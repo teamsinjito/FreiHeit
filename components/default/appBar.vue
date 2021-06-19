@@ -13,14 +13,12 @@
         </v-btn>
       </template>
       <v-card>
-        <v-card-title class="text-h5 grey lighten-2">
-          格画面の説明
-        </v-card-title>
+        <v-card-title color="primary"> 各画面の説明 </v-card-title>
         <v-carousel v-model="carousel" light hide-delimiter-background>
           <v-carousel-item v-for="n in 5" :key="n">
             <v-sheet height="100%" tile>
               <v-row class="fill-height" align="center" justify="center">
-                <v-img height="250" src="/login_bg.png"></v-img>
+                <v-img height="250" :src="`/help_${n}.png`"></v-img>
               </v-row>
             </v-sheet>
           </v-carousel-item>

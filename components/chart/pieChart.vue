@@ -95,6 +95,13 @@ export default defineComponent({
       (newPieData) => {
         if (state.chart) {
           state.chart.data = newPieData
+          if (state.chart.options) {
+            if (state.chart.options.title) {
+              if (state.chart.options.title.text) {
+                state.chart.options.title.text = `${props.selectSubject}別 収益の推移`
+              }
+            }
+          }
           state.chart.update()
         }
       }

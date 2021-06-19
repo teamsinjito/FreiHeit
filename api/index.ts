@@ -54,11 +54,13 @@ app.post(connectDefaultWorks, async (req: Request, res) => {
     await client
       .query(sql.defaultWorkInfo.query, [input])
       .then((result) => {
-        workDefault.id = result.rows[0].id
-        workDefault.name = result.rows[0].name
-        workDefault.last = result.rows[0].last
-        console.log(workDefault)
-        console.log('DB:get complete')
+        if (result.rows[0] !== undefined) {
+          workDefault.id = result.rows[0].id
+          workDefault.name = result.rows[0].name
+          workDefault.last = result.rows[0].last
+          console.log(workDefault)
+          console.log('DB:get complete')
+        }
         res.json(workDefault)
       })
       .catch((e) => {
@@ -144,22 +146,35 @@ app.post(connectPathUsers, async (req: Request, res) => {
       .catch((e) => {
         throw e
       })
+    if (input.workInfo[0] !== undefined) {
+      // 取引管理情報取得
+      await client
+        .query(sql.userRecordsManagement.query, [
+          input.workInfo[0].id,
+          new Date().getFullYear() - 1 + '-01-01',
+          new Date().getFullYear() - 1 + '-12-31',
+        ])
+        .then((result) => {
+          console.log('result.rows.recordManagement', result.rows)
+          input.workRecordsManagement = result.rows
+          // console.log('userRecordsManagement', input.userRecordsManagement)
+        })
+        .catch((e) => {
+          throw e
+        })
 
-    // 取引管理情報取得
-    await client
-      .query(sql.userRecordsManagement.query, [
-        input.workInfo[0].id,
-        new Date().getFullYear() - 1 + '-01-01',
-        new Date().getFullYear() - 1 + '-12-31',
-      ])
-      .then((result) => {
-        console.log('result.rows.recordManagement', result.rows)
-        input.workRecordsManagement = result.rows
-        // console.log('userRecordsManagement', input.userRecordsManagement)
-      })
-      .catch((e) => {
-        throw e
-      })
+      // ユーザ情報取得
+      await client
+        .query(sql.clientsAndCostsInfo.query, [input.workInfo[0].id])
+        .then((result) => {
+          console.log('result.rows.clientsAndCostsInfo', result.rows)
+          input.clientsAndCostsInfo = result.rows
+          // console.log('userInfo', input.userInfo)
+        })
+        .catch((e) => {
+          throw e
+        })
+    }
 
     // 勘定科目一覧取得
     await client
@@ -168,18 +183,6 @@ app.post(connectPathUsers, async (req: Request, res) => {
         console.log('result.rows.subjectsInfo', result.rows)
         input.subjectsInfo = result.rows
         // console.log('subjectsInfo', input.subjectsInfo)
-      })
-      .catch((e) => {
-        throw e
-      })
-
-    // ユーザ情報取得
-    await client
-      .query(sql.clientsAndCostsInfo.query, [input.workInfo[0].id])
-      .then((result) => {
-        console.log('result.rows.clientsAndCostsInfo', result.rows)
-        input.clientsAndCostsInfo = result.rows
-        // console.log('userInfo', input.userInfo)
       })
       .catch((e) => {
         throw e

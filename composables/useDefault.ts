@@ -527,7 +527,6 @@ export const getDefaultWork = (authId: string): Promise<Works> =>
           })
         } else {
           reject(new Error('NG'))
-          alert('初期処理に失敗しました。')
         }
       })
       .catch(() => {

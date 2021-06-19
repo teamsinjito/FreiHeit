@@ -20,85 +20,195 @@
         </v-card-title>
       </v-toolbar>
       <v-card-text>
-        <v-container>
+        <v-container style="max-height: 430px; overflow: auto">
           <v-row>
             <v-col cols="12">
               <v-text-field
-                v-model="inputPay"
-                class="font-weight-bol"
-                label="金額"
-                required
-                :rules="payRules"
-                type="text"
-                autofocus
-                suffix="円"
-                @input="repNumber"
-              ></v-text-field>
+                v-model="inputDate"
+                label="取引発生日"
+                type="date"
+                filled
+                dense
+                :rules="dayRules"
+                class="text-caption text-sm-subtitle-2"
+                ><template #[`label`]>
+                  <label class="text-caption text-sm-subtitle-2"
+                    ><v-icon class="text-caption text-sm-subtitle-2"
+                      >mdi-calendar-edit</v-icon
+                    >：取引発生日</label
+                  ><span class="red--text ml-3">*</span>
+                </template></v-text-field
+              >
             </v-col>
           </v-row>
           <v-row>
-            <v-col cols="12" sm="6">
+            <v-col cols="12" sm="6" class="py-0">
               <v-autocomplete
                 v-model="inputSubject"
+                class="text-caption"
                 :items="userState.subjectsInfo.value"
                 item-value="id"
                 item-text="name"
                 label="勘定科目"
+                outlined
                 :rules="nameRules"
                 required
-                style="font-size: 0.9rem"
-              ></v-autocomplete>
+                dense
+                ><template #[`label`]>
+                  <label class="text-caption"
+                    ><v-icon class="text-caption">mdi-tag</v-icon
+                    >：勘定科目</label
+                  ><span class="red--text ml-3">*</span>
+                </template></v-autocomplete
+              >
             </v-col>
-            <v-col cols="4" sm="2">
+            <v-col cols="12" sm="6" class="py-0">
               <v-text-field
-                v-model="inputYear"
-                label="年"
-                disabled
-                style="font-size: 0.9rem"
-              ></v-text-field>
+                v-model="inputPay"
+                class="text-caption"
+                label="金額"
+                outlined
+                required
+                :rules="payRules"
+                type="text"
+                suffix="円"
+                dense
+                @input="repNumber"
+                ><template #[`label`]>
+                  <label class="text-caption"
+                    ><v-icon class="text-caption"
+                      >mdi-label-variant-outline</v-icon
+                    >金額</label
+                  ><span class="red--text ml-3">*</span>
+                </template></v-text-field
+              >
             </v-col>
-            <v-col cols="4" sm="2">
-              <v-autocomplete
-                v-model="inputMonth"
-                item-value="value"
-                item-text="id"
-                :items="month"
-                label="月"
-                :rules="nameRules"
-                style="font-size: 0.9rem"
-              ></v-autocomplete>
+            <v-col cols="12" class="pt-0">
+              <v-card>
+                <v-card-title class="text-caption"
+                  ><v-icon class="text-caption">mdi-comment</v-icon
+                  ><span style="opacity: 0.6"
+                    >：取引内訳（以下1つのみ入力）</span
+                  ><span class="red--text ml-1">*</span>
+                  <span v-if="validErrFlg" class="red--text ml-3"
+                    >※いづれか入力必須です</span
+                  >
+                </v-card-title>
+                <v-col cols="12" class="py-0">
+                  <v-combobox
+                    key="0"
+                    v-model="inputClientAndCostValueAry[0]"
+                    :items="filterClientAndCost(0)"
+                    item-text="name"
+                    class="text-caption"
+                    :search-input.sync="noDataValue"
+                    label="取引先"
+                    outlined
+                    cache-items
+                    small-chips
+                    item-value="name"
+                    :return-object="false"
+                    dense
+                    @change="changeClientAndCost(0)"
+                    ><template #[`label`]>
+                      <label class="text-caption"
+                        ><v-icon class="text-caption"
+                          >mdi-office-building-outline</v-icon
+                        >：取引先</label
+                      ></template
+                    ><template #[`no-data`]>
+                      <v-list-item>
+                        <v-list-item-content>
+                          <v-list-item-title class="text-caption">
+                            候補が存在しません。入力後、<kbd>Enter</kbd>キーを押して追加してください。
+                          </v-list-item-title>
+                        </v-list-item-content>
+                      </v-list-item>
+                    </template></v-combobox
+                  >
+                </v-col>
+                <v-col cols="12" class="py-0">
+                  <v-combobox
+                    key="1"
+                    v-model="inputClientAndCostValueAry[1]"
+                    :items="filterClientAndCost(1)"
+                    item-text="name"
+                    class="text-caption"
+                    :search-input.sync="noDataValue"
+                    label="品目"
+                    outlined
+                    cache-items
+                    small-chips
+                    item-value="name"
+                    :return-object="false"
+                    dense
+                    @change="changeClientAndCost(1)"
+                    ><template #[`label`]>
+                      <label class="text-caption"
+                        ><v-icon class="text-caption">mdi-layers-triple</v-icon
+                        >：品目</label
+                      ></template
+                    ><template #[`no-data`]>
+                      <v-list-item>
+                        <v-list-item-content>
+                          <v-list-item-title class="text-caption">
+                            候補が存在しません。入力後、<kbd>Enter</kbd>キーを押して追加してください。
+                          </v-list-item-title>
+                        </v-list-item-content>
+                      </v-list-item>
+                    </template></v-combobox
+                  >
+                </v-col>
+                <v-col cols="12" class="py-0">
+                  <v-combobox
+                    key="2"
+                    v-model="inputClientAndCostValueAry[2]"
+                    :items="filterClientAndCost(2)"
+                    item-text="name"
+                    class="text-caption"
+                    :search-input.sync="noDataValue"
+                    label="固定経費"
+                    outlined
+                    cache-items
+                    small-chips
+                    item-value="name"
+                    :return-object="false"
+                    dense
+                    @change="changeClientAndCost(2)"
+                    ><template #[`label`]>
+                      <label class="text-caption"
+                        ><v-icon class="text-caption">mdi-file-table</v-icon
+                        >：固定経費</label
+                      ></template
+                    ><template #[`no-data`]>
+                      <v-list-item>
+                        <v-list-item-content>
+                          <v-list-item-title class="text-caption">
+                            候補が存在しません。入力後、<kbd>Enter</kbd>キーを押して追加してください。
+                          </v-list-item-title>
+                        </v-list-item-content>
+                      </v-list-item>
+                    </template></v-combobox
+                  >
+                </v-col>
+              </v-card>
             </v-col>
-            <v-col cols="4" sm="2">
-              <v-autocomplete
-                v-model="inputDay"
-                item-value="value"
-                item-text="id"
-                :items="date"
-                label="日"
-                style="font-size: 0.9rem"
-                :rules="nameRules"
-              ></v-autocomplete>
-            </v-col>
-            <v-col cols="12">
-              <v-autocomplete
-                v-model="inputClientAndCost"
-                item-value="id"
-                item-text="name"
-                :items="userState.clientsAndCostsInfo.value"
-                label="取引先/固定経費"
-                style="font-size: 0.9rem"
-                :rules="nameRules"
-                @change="matchInputNote(inputClientAndCost)"
-              ></v-autocomplete>
-            </v-col>
-            <v-col cols="12">
-              <v-text-field
+            <v-col cols="12" class="pb-0">
+              <v-textarea
                 v-model="inputNote"
-                label="摘要"
-                style="font-size: 0.9rem"
+                label="メモ"
+                class="text-caption"
                 :rules="maxRules"
-                required
-              ></v-text-field>
+                outlined
+                dense
+                counter="140"
+                ><template #[`label`]>
+                  <label class="text-caption"
+                    ><v-icon class="text-caption">mdi-card-text-outline</v-icon
+                    >：メモ</label
+                  >
+                </template></v-textarea
+              >
             </v-col>
           </v-row>
         </v-container>
@@ -130,7 +240,7 @@ import {
   reactive,
   toRefs,
   ref,
-  onBeforeMount,
+  onMounted,
 } from '@vue/composition-api'
 import { useGlobalState } from '../../composables/useDefault'
 import { RecordsManagement } from '../../composables/interface'
@@ -179,9 +289,12 @@ export default defineComponent({
         '※半角数値のみ入力してください',
     ]
     const maxRules = [
-      (v: string) => v.length <= 50 || '※50文字以下で入力してください',
+      (v: string) => v.length <= 140 || '※140文字以下で入力してください',
     ]
     const nameRules = [(v: string) => !!v || '※入力必須です']
+    // const clientCostRules = [
+    //   // (v: string) => (!!v && v.length <= 50) || '※50文字以下で入力してください',
+    // ]
     const dayRules = [
       (v: string) => !!v || '※入力必須です',
       (v: string) => v.length <= 10 || '※10文字以下で入力してください',
@@ -189,79 +302,91 @@ export default defineComponent({
         (Number(v.slice(0, 4)) >= 2000 && Number(v.slice(0, 4)) <= 2099) ||
         '※2000年から2099年の範囲で入力してください',
     ]
+    onMounted(() => {
+      toNameFromidClientsAndCost()
+    })
+    const filterClientAndCost = (n: number) => {
+      return userState.clientsAndCostsInfo.value.filter((i) => {
+        return i.iflg === n
+      })
+    }
+    const changeClientAndCost = (n: number) => {
+      if (n === 0) {
+        state.inputClientAndCostValueAry[1] = ''
+        state.inputClientAndCostValueAry[2] = ''
+      } else if (n === 1) {
+        state.inputClientAndCostValueAry[0] = ''
+        state.inputClientAndCostValueAry[2] = ''
+      } else {
+        state.inputClientAndCostValueAry[0] = ''
+        state.inputClientAndCostValueAry[1] = ''
+      }
 
+      // 存在チェック
+      const num = userState.clientsAndCostsInfo.value.filter((c) => {
+        return c.name === state.inputClientAndCostValueAry[n]
+      }).length
+
+      // 存在していない場合新規登録
+      if (num === 0) {
+        userState.insertClientCost({
+          id: '',
+          wid: userState.workInfo.value[0].id,
+          name: state.inputClientAndCostValueAry[n],
+          iflg: n,
+          color: '#' + Math.floor(Math.random() * 16777215).toString(16),
+        })
+      }
+      state.validErrFlg = false
+    }
+    const toNameFromidClientsAndCost = () => {
+      const tmpVal = userState.clientsAndCostsInfo.value
+        .filter((i) => {
+          return i.id === props.defaultRecords.cid
+        })
+        .map((i) => {
+          return { name: i.name, iflg: i.iflg }
+        })[0]
+      if (tmpVal !== undefined) {
+        state.inputClientAndCostValueAry[tmpVal.iflg] = tmpVal.name
+      }
+    }
+    const toIdFromNameClientsAndCost = () => {
+      state.inputClientAndCostValue = userState.clientsAndCostsInfo.value
+        .filter((i) => {
+          return i.name === state.inputClientAndCostValueAry[i.iflg]
+        })
+        .map((i) => {
+          return i.id
+        })[0]
+    }
     const state = reactive<{
       valid: boolean
       id: string
       checkbox: boolean
       inputPay: string
-      inputYear: number
-      inputMonth: string
-      inputDay: string
+      inputDate: string
       inputSubject: string
       inputClientAndCost: string
+      inputClientAndCostValue: string
+      inputClientAndCostValueAry: string[]
+      noDataValue: string
       inputNote: string
+      validErrFlg: boolean
     }>({
       valid: false,
       id: props.defaultRecords.id,
       checkbox: props.continueFlg,
-      inputYear:
-        Number(props.defaultRecords.day.slice(0, 4)) |
-        userState.currentSysYear.value.num,
-      inputMonth: props.defaultRecords.day.slice(5, 7),
-      inputDay: props.defaultRecords.day.slice(8, 10),
+      inputDate: props.defaultRecords.day,
       inputPay: props.defaultRecords.pay.toLocaleString().toString(),
       inputSubject: props.defaultRecords.sid,
       inputClientAndCost: props.defaultRecords.cid,
+      inputClientAndCostValue: '',
+      inputClientAndCostValueAry: [],
+      noDataValue: '',
       inputNote: props.defaultRecords.note,
+      validErrFlg: false,
     })
-    const month = [
-      { id: '1', value: '01' },
-      { id: '2', value: '02' },
-      { id: '3', value: '03' },
-      { id: '4', value: '04' },
-      { id: '5', value: '05' },
-      { id: '6', value: '06' },
-      { id: '7', value: '07' },
-      { id: '8', value: '08' },
-      { id: '9', value: '09' },
-      { id: '10', value: '10' },
-      { id: '11', value: '11' },
-      { id: '12', value: '12' },
-    ]
-    const date = [
-      { id: '1', value: '01' },
-      { id: '2', value: '02' },
-      { id: '3', value: '03' },
-      { id: '4', value: '04' },
-      { id: '5', value: '05' },
-      { id: '6', value: '06' },
-      { id: '7', value: '07' },
-      { id: '8', value: '08' },
-      { id: '9', value: '09' },
-      { id: '10', value: '10' },
-      { id: '11', value: '11' },
-      { id: '12', value: '12' },
-      { id: '13', value: '13' },
-      { id: '14', value: '14' },
-      { id: '15', value: '15' },
-      { id: '16', value: '16' },
-      { id: '17', value: '17' },
-      { id: '18', value: '18' },
-      { id: '19', value: '19' },
-      { id: '20', value: '20' },
-      { id: '21', value: '21' },
-      { id: '22', value: '22' },
-      { id: '23', value: '23' },
-      { id: '24', value: '24' },
-      { id: '25', value: '25' },
-      { id: '26', value: '26' },
-      { id: '27', value: '27' },
-      { id: '28', value: '28' },
-      { id: '29', value: '29' },
-      { id: '30', value: '30' },
-      { id: '31', value: '31' },
-    ]
     // 金額の3桁区切り変換
     const repNumber = () => {
       state.inputPay = Number(
@@ -269,21 +394,17 @@ export default defineComponent({
       ).toLocaleString()
     }
 
-    // 摘要および取引先、固定経費の同期
-    const matchInputNote = (m: string) => {
-      state.inputNote = userState.clientsAndCostsInfo.value.filter(
-        (c) => c.id === m
-      )[0].name
-    }
-
     const cancelDialog = () => {
       context.emit('open-close', !props.dialog)
     }
 
     const execCash = () => {
+      toIdFromNameClientsAndCost()
       // バリデーションチェック
-      if (!form.value.validate()) {
+      if (!form.value.validate() || state.inputClientAndCostValue === '') {
+        console.log(state.inputClientAndCostValue)
         console.log('validation error!')
+        state.validErrFlg = true
         return
       }
 
@@ -295,8 +416,8 @@ export default defineComponent({
           wid: userState.workInfo.value[0].id,
           pay: Number(state.inputPay.replaceAll(',', '')),
           sid: state.inputSubject,
-          day: state.inputYear + '-' + state.inputMonth + '-' + state.inputDay,
-          cid: state.inputClientAndCost,
+          day: state.inputDate,
+          cid: state.inputClientAndCostValue,
           note: state.inputNote,
           update: new Date().toLocaleString('ja'),
         },
@@ -315,13 +436,12 @@ export default defineComponent({
     return {
       form,
       nameRules,
+      filterClientAndCost,
+      changeClientAndCost,
       dayRules,
       payRules,
       maxRules,
-      month,
-      date,
       ...toRefs(state),
-      matchInputNote,
       userState,
       cancelDialog,
       execCash,

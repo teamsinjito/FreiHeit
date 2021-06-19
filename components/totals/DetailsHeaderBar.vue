@@ -17,6 +17,7 @@ import { defineComponent } from '@vue/composition-api'
 import { Details } from '@/composables/interface'
 import pdfMake from 'pdfmake/build/pdfmake'
 import '@/static/vfs_fonts.js'
+import { TDocumentDefinitions } from 'pdfmake/interfaces'
 export default defineComponent({
   props: {
     records: {
@@ -51,7 +52,6 @@ export default defineComponent({
         pageMargins: [20, 20, 20, 20],
         content: [
           {
-            alignment: 'justify',
             columns: [
               { text: '項目別明細表', style: { color: 'black', fontSize: 10 } },
               {
@@ -184,7 +184,7 @@ export default defineComponent({
         })
       })
       // pdfMakeでのPDF出力
-      pdfMake.createPdf(docDefinition).download()
+      pdfMake.createPdf(docDefinition as TDocumentDefinitions).download()
     }
 
     return { print }

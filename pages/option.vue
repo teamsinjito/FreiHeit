@@ -12,7 +12,7 @@
       <v-card-text>
         <v-row>
           <v-expansion-panels v-model="panel" focusable multiple>
-            <v-col cols="12" sm="6">
+            <v-col cols="12" sm="4">
               <v-expansion-panel :key="0">
                 <v-expansion-panel-header color="primary" class="white--text"
                   >取引先設定 </v-expansion-panel-header
@@ -35,7 +35,7 @@
                   <!-- テーブル -->
                   <v-data-table
                     fixed-header
-                    :items="filterClientOrCost(1)"
+                    :items="filterClientOrCost(0)"
                     height="40vh"
                     :items-per-page="100"
                     hide-default-header
@@ -66,8 +66,62 @@
                 </v-expansion-panel-content>
               </v-expansion-panel>
             </v-col>
-            <v-col cols="12" sm="6">
+            <v-col cols="12" sm="4">
               <v-expansion-panel :key="1">
+                <v-expansion-panel-header color="primary" class="white--text"
+                  >品目設定 </v-expansion-panel-header
+                ><v-expansion-panel-content class="pt-5">
+                  <v-toolbar flat>
+                    <v-toolbar-title
+                      class="text-sm-subtitle-1 text-caption font-weight-black"
+                      >品目一覧</v-toolbar-title
+                    >
+                    <v-divider class="mx-4" inset vertical></v-divider>
+                    <v-spacer></v-spacer>
+                    <!-- 品目追加ボタン ダイアログ -->
+                    <add-client-cost
+                      title="品目追加"
+                      subtitle="品目名称を入力してください"
+                      :iflg="clientNum"
+                    ></add-client-cost>
+                  </v-toolbar>
+                  <v-divider></v-divider>
+                  <!-- テーブル -->
+                  <v-data-table
+                    fixed-header
+                    :items="filterClientOrCost(1)"
+                    height="40vh"
+                    :items-per-page="100"
+                    hide-default-header
+                    hide-default-footer
+                    style="overflow: auto; max-height: 40vh"
+                  >
+                    <template #[`item`]="{ item }">
+                      <tr>
+                        <th class="text-caption">
+                          <v-avatar
+                            :color="item.color"
+                            size="13"
+                            class="mr-3"
+                          ></v-avatar>
+                          {{ item.name }}
+                        </th>
+                        <th class="text-right">
+                          <update-client-cost
+                            title="品目更新"
+                            subtitle="品目名称を編集できます"
+                            :iflg="clientNum"
+                            :default-record="item"
+                          ></update-client-cost>
+                        </th>
+                      </tr>
+                    </template>
+                  </v-data-table>
+                </v-expansion-panel-content>
+              </v-expansion-panel>
+            </v-col>
+            <v-col cols="12" sm="4">
+              <v-expansion-panel :key="2">
                 <v-expansion-panel-header color="primary" class="white--text"
                   >固定経費設定 </v-expansion-panel-header
                 ><v-expansion-panel-content class="pt-5">
@@ -145,7 +199,7 @@ export default defineComponent({
     const costNum = 2
     const state = reactive<{
       panel: number[]
-    }>({ panel: [0, 1] })
+    }>({ panel: [0, 1, 2] })
     const dialog = false
     const checkbox = false
     const filterClientOrCost = (n: number) => {

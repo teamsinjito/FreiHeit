@@ -300,6 +300,11 @@ const createGlobalState = (userId: string) => {
 
   // 取引先もしくは固定経費追加
   const insertClientCost = async (ary: ClientsAndCosts) => {
+    if (ary.name.trim() === '') {
+      console.log('固定経費：失敗!')
+      snackBarDisplay('取引内訳の登録に入力してください', '')
+      return
+    }
     // uuid生成
     ary.id = uuidv4()
     await axios
@@ -311,9 +316,13 @@ const createGlobalState = (userId: string) => {
           globalState.clientsAndCostsInfo.push(ary)
 
           console.log(globalState.clientsAndCostsInfo)
-          if (ary.iflg === 1) {
+          if (ary.iflg === 0) {
             console.log('取引先追加：成功!')
             snackBarDisplay('取引先の登録が正常に完了しました。', '')
+          } else if (ary.iflg === 1) {
+            console.log(ary)
+            console.log('品目追加：成功!')
+            snackBarDisplay('品目の登録が正常に完了しました。', '')
           } else {
             console.log(ary)
             console.log('固定経費追加：成功!')

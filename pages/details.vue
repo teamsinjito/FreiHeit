@@ -40,6 +40,14 @@
             <template #label>
               <span class="text-caption">取引先および固定経費を選択</span>
             </template>
+            <template #selection="{ item, index }">
+              <v-chip v-if="index === 0" class="text-caption">
+                <span>{{ item.name }}</span>
+              </v-chip>
+              <span v-if="index === 1" class="grey--text text-caption">
+                (+{{ selectClientsAndCosts.length - 1 }} others)
+              </span>
+            </template>
           </v-select>
         </v-col>
       </v-row>
@@ -299,9 +307,13 @@ export default defineComponent({
      */
     const setClientsAndCosts = () => {
       // 選択中の勘定科目コードを取得
-      const selectSubjectCode = useState.subjectsInfo.value.find((subject) => {
-        return subject.name === state.selectSubject
-      })?.id
+      const selectSubjectCode = useState.subjectsInfo.value
+        .filter((subject) => {
+          return subject.groupname === state.selectSubject
+        })
+        .map((val) => {
+          return val.id
+        })
 
       if (selectSubjectCode) {
         // 選択中の勘定科目コードを基に、取引データから取引先・固定経費コードをフィルタリングして取得
@@ -309,7 +321,7 @@ export default defineComponent({
           new Set(
             useState.workRecordsManagement.value
               .filter((workRecord) => {
-                return workRecord.sid === selectSubjectCode
+                return selectSubjectCode.includes(workRecord.sid)
               })
               .map((filterWorkRecord) => {
                 return filterWorkRecord.cid

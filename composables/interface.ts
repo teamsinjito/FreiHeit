@@ -93,3 +93,35 @@ export interface WorkChange {
 export interface Request {
   body: { key: string }
 }
+
+export interface pdfRecord {
+  position: number
+  pay: number
+}
+export interface pdfFormatRecord {
+  day: string
+  dayFormat: string
+  cName: string // clientsAndCosts
+  // cid: string // clientsAndCosts
+  nomalPays: pdfRecord[]
+  // pay: number
+  // position: number // SubjectsList
+  // costsPays: pdfRecord[]
+  // itemFlg: number // clientsAndCosts
+}
+export interface pdfFormatCost {
+  cid: string
+  cName: string
+  costPays: pdfRecord[]
+}
+// export interface pdfFormatSubjectTotalPay {
+//   position: number
+//   sumPay: number
+// }
+export interface pdfFormatRecordList {
+  month: number
+  list: pdfFormatRecord[]
+  costList: pdfFormatCost[]
+  total: pdfRecord[]
+  carryOver: number
+}

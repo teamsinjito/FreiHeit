@@ -252,7 +252,7 @@ export default defineComponent({
           })
           const targetCost = shapingTargetData
             .filter((data) => {
-              return data.day.substring(0, 7) === month
+              return data.day.substring(5, 7) === month
             })
             .map((val) => {
               return val.pay

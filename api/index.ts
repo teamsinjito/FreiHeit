@@ -44,7 +44,8 @@ configure({
   categories: { default: { appenders: ['app'], level: 'error' } },
 })
 const logger = getLogger()
-app.listen(8083)
+app.set('port', process.env.PORT || 8083)
+app.listen(app.get('port'))
 app.use(express.json())
 
 app.post(connectDefaultWorks, async (req: Request, res) => {

@@ -292,7 +292,9 @@ export default defineComponent({
       (v: string) => v.length <= 140 || '※140文字以下で入力してください',
     ]
     const nameRules = [(v: string) => !!v || '※入力必須です']
-
+    // const clientCostRules = [
+    //   // (v: string) => (!!v && v.length <= 50) || '※50文字以下で入力してください',
+    // ]
     const dayRules = [
       (v: string) => !!v || '※入力必須です',
       (v: string) => v.length <= 10 || '※10文字以下で入力してください',
@@ -400,6 +402,8 @@ export default defineComponent({
       toIdFromNameClientsAndCost()
       // バリデーションチェック
       if (!form.value.validate() || state.inputClientAndCostValue === '') {
+        console.log(state.inputClientAndCostValue)
+        console.log('validation error!')
         state.validErrFlg = true
         return
       }

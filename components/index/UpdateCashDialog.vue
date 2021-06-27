@@ -36,7 +36,7 @@ export default defineComponent({
       required: true,
     },
   },
-  setup() {
+  setup(props, context) {
     const useState = useGlobalState()
     const state = reactive<{
       dialog: boolean

@@ -33,7 +33,7 @@ import CashDialogForm from './CashDialogForm.vue'
 
 export default defineComponent({
   components: { CashDialogForm },
-  setup(_props) {
+  setup(_props, context) {
     const useState = useGlobalState()
     const state = reactive<{
       dialog: boolean

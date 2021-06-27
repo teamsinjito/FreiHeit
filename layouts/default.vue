@@ -1,5 +1,18 @@
 <template>
-  <v-app v-if="userState.displayShow.value && !display">
+  <v-app v-if="userState.displayShow.value">
+    <v-dialog v-model="display" persistent max-width="600px">
+      <my-office-form
+        v-if="display"
+        :dialog="display"
+        title="事業所追加"
+        subtitle="初めに事業所名称を入力してください"
+        :continue-flg="true"
+        btn-name="登録"
+        :default-records="newRecord"
+        @exec="insertClientCost"
+        @open-close="dialogOpenClose"
+      ></my-office-form>
+    </v-dialog>
     <!-- サイドバー -->
     <nav-drawer
       :mini="mini"
@@ -23,6 +36,7 @@
     </v-main>
     <!-- フッター -->
     <v-footer color="justify-center text-caption">© 2021 Team SINJITO</v-footer>
+
     <!-- オーバレイ -->
     <v-overlay
       v-model="userState.overlayShow.value"
@@ -32,22 +46,6 @@
       <p>{{ userState.overlayText.value }}</p>
       <v-progress-circular :value="20" indeterminate> </v-progress-circular>
     </v-overlay>
-  </v-app>
-  <v-app v-else-if="userState.displayShow.value && display">
-    <v-dialog v-model="display" persistent max-width="600px">
-      <my-office-form
-        v-if="display"
-        :dialog="display"
-        title="事業所追加"
-        subtitle="初めに事業所名称を入力してください"
-        :continue-flg="false"
-        :cancel-flg="false"
-        btn-name="登録"
-        :default-records="newRecord"
-        @exec="insertClientCost"
-        @open-close="dialogOpenClose"
-      ></my-office-form>
-    </v-dialog>
   </v-app>
   <v-app v-else
     ><v-sheet
@@ -104,6 +102,7 @@ export default defineComponent({
     })
     getDefaultWork(context.root.$store.$auth.user.sub as string).then((r) => {
       state.office = r
+      console.log('state', state.office)
       if (state.office.id === '') {
         state.display = true
       }
@@ -111,6 +110,7 @@ export default defineComponent({
 
     provideGlobalState(context.root.$store.$auth.user.sub as string)
     const userState = useGlobalState()
+    console.log(userState)
     // 関数群
     const switchNavVar = (m: boolean) => {
       state.mini = m
@@ -118,10 +118,18 @@ export default defineComponent({
     const dialogOpenClose = (v: boolean) => {
       state.display = v
     }
-    const insertClientCost = (record: InsertUpdateWorks) => {
+    const insertClientCost = (record: InsertUpdateWorks, v: boolean) => {
+      state.display = v
       userState.insertMyOffice(record).then(() => {
-        location.reload()
+        getDefaultWork(context.root.$store.$auth.user.sub as string).then(
+          (r) => {
+            state.office = r
+            console.log(state.office)
+            console.log(userState.workInfo)
+          }
+        )
       })
+      // useState.insertClientCost(record)
     }
     return {
       ...toRefs(state),

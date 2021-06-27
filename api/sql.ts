@@ -89,8 +89,4 @@ export const sql = {
   deleteClientCost: {
     query: 'delete from clients_and_costs where id = $1 ;',
   },
-
-  helpsInfo: {
-    query: 'select title, body from helps;',
-  },
 }

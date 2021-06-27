@@ -14,6 +14,7 @@
 </template>
 <script>
 import { defineComponent } from '@vue/composition-api'
+// import { printPdf } from '@/composables/useChart'
 import { useGlobalState } from '@/composables/useDefault'
 import html2canvas from 'html2canvas'
 import pdfMake from 'pdfmake/build/pdfmake'

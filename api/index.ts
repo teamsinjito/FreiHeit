@@ -1,7 +1,6 @@
 import express from 'express'
 import { config } from 'dotenv'
 import pg from 'pg'
-import { configure, getLogger } from 'log4js'
 import {
   connectDefaultWorks,
   connectPathUsers,
@@ -39,12 +38,7 @@ export const pool = new pg.Pool({
 })
 config()
 
-configure({
-  appenders: { app: { type: 'file', filename: './logs/app.log' } },
-  categories: { default: { appenders: ['app'], level: 'error' } },
-})
-const logger = getLogger()
-app.listen(8083)
+app.listen(8083, () => console.log('API Mock Server is running'))
 app.use(express.json())
 
 app.post(connectDefaultWorks, async (req: Request, res) => {
@@ -64,15 +58,16 @@ app.post(connectDefaultWorks, async (req: Request, res) => {
           workDefault.id = result.rows[0].id
           workDefault.name = result.rows[0].name
           workDefault.last = result.rows[0].last
+          console.log(workDefault)
+          console.log('DB:get complete')
         }
-        logger.info('aha!')
         res.json(workDefault)
       })
       .catch((e) => {
-        logger.error(e)
         throw e
       })
   } catch (e) {
+    console.log(e)
     res.json(false)
   } finally {
     if (client) client.release()
@@ -139,14 +134,6 @@ app.post(connectPathUsers, async (req: Request, res) => {
       color: '',
       view: false,
     },
-
-    // ヘルプ
-    helpsInfo: [
-      {
-        title: '',
-        body: '',
-      },
-    ],
   }
   try {
     // ユーザ情報取得
@@ -154,6 +141,7 @@ app.post(connectPathUsers, async (req: Request, res) => {
       .query(sql.workInfo.query, [req.body.key])
       .then((result) => {
         input.workInfo = result.rows
+        // console.log('userInfo', input.userInfo)
       })
       .catch((e) => {
         throw e
@@ -167,7 +155,9 @@ app.post(connectPathUsers, async (req: Request, res) => {
           new Date().getFullYear() - 1 + '-12-31',
         ])
         .then((result) => {
+          console.log('result.rows.recordManagement', result.rows)
           input.workRecordsManagement = result.rows
+          // console.log('userRecordsManagement', input.userRecordsManagement)
         })
         .catch((e) => {
           throw e
@@ -177,7 +167,9 @@ app.post(connectPathUsers, async (req: Request, res) => {
       await client
         .query(sql.clientsAndCostsInfo.query, [input.workInfo[0].id])
         .then((result) => {
+          console.log('result.rows.clientsAndCostsInfo', result.rows)
           input.clientsAndCostsInfo = result.rows
+          // console.log('userInfo', input.userInfo)
         })
         .catch((e) => {
           throw e
@@ -188,7 +180,9 @@ app.post(connectPathUsers, async (req: Request, res) => {
     await client
       .query(sql.subjectsInfo.query)
       .then((result) => {
+        console.log('result.rows.subjectsInfo', result.rows)
         input.subjectsInfo = result.rows
+        // console.log('subjectsInfo', input.subjectsInfo)
       })
       .catch((e) => {
         throw e
@@ -199,24 +193,16 @@ app.post(connectPathUsers, async (req: Request, res) => {
       .query(sql.tabsInfo.query)
       .then((result) => {
         input.tabsInfo = result.rows
+        // console.log('subjectsInfo', input.subjectsInfo)
       })
       .catch((e) => {
         throw e
       })
 
-    // ヘルプ情報取得
-    await client
-      .query(sql.helpsInfo.query)
-      .then((result) => {
-        input.helpsInfo = result.rows
-      })
-      .catch((e) => {
-        throw e
-      })
-
+    // console.log('Total', input)
     res.json(input)
   } catch (e) {
-    logger.error(e)
+    console.log(e)
     res.json(null)
   } finally {
     if (client) client.release()
@@ -228,17 +214,21 @@ app.post(connectPathInsertWorks, async (req, res) => {
   const client = await pool.connect()
   const input: InsertUpdateWorks = req.body.key
 
+  console.log(input)
+
   try {
     await client
       .query(sql.insertWork.query, [input.id, input.uid, input.name])
       .then(() => {
+        console.log('DB:insert complete')
         res.json(true)
+        // console.log('userInfo', input.userInfo)
       })
       .catch((e) => {
         throw e
       })
   } catch (e) {
-    logger.error(e)
+    console.log(e)
     res.json(false)
   } finally {
     if (client) client.release()
@@ -250,18 +240,21 @@ app.post(connectPathUpdateWorks, async (req, res) => {
   const client = await pool.connect()
   const input: InsertUpdateWorks = req.body.key
 
+  console.log(input)
+
   try {
     // 事業所テーブル更新
     await client
       .query(sql.updateWork.query, [input.name, input.id])
       .then(() => {
+        console.log('DB:update complete')
         res.json(true)
       })
       .catch((e) => {
         throw e
       })
   } catch (e) {
-    logger.error(e)
+    console.log(e)
     res.json(false)
   } finally {
     if (client) client.release()
@@ -273,18 +266,21 @@ app.post(connectPathDeleteWorks, async (req, res) => {
   const client = await pool.connect()
   const input: string = req.body.key
 
+  console.log(input)
+
   try {
     // 事業所テーブル更新
     await client
       .query(sql.deleteWork.query, [input])
       .then(() => {
+        console.log('DB:delete complete')
         res.json(true)
       })
       .catch((e) => {
         throw e
       })
   } catch (e) {
-    logger.error(e)
+    console.log(e)
     res.json(false)
   } finally {
     if (client) client.release()
@@ -295,6 +291,8 @@ app.post(connectPathDeleteWorks, async (req, res) => {
 app.post(connectPathInsertRecordsManagement, async (req, res) => {
   const client = await pool.connect()
   const input: RecordsManagement = req.body.key
+
+  console.log(input)
 
   try {
     await client
@@ -309,13 +307,15 @@ app.post(connectPathInsertRecordsManagement, async (req, res) => {
         input.update,
       ])
       .then(() => {
+        console.log('DB:insert complete')
         res.json(true)
+        // console.log('userInfo', input.userInfo)
       })
       .catch((e) => {
         throw e
       })
   } catch (e) {
-    logger.error(e)
+    console.log(e)
     res.json(false)
   } finally {
     if (client) client.release()
@@ -326,6 +326,8 @@ app.post(connectPathInsertRecordsManagement, async (req, res) => {
 app.post(connectPathUpdateRecordsManagement, async (req, res) => {
   const client = await pool.connect()
   const input: RecordsManagement = req.body.key
+
+  console.log(input)
 
   try {
     // 取引管理テーブル更新
@@ -340,13 +342,14 @@ app.post(connectPathUpdateRecordsManagement, async (req, res) => {
         input.id,
       ])
       .then(() => {
+        console.log('DB:update complete')
         res.json(true)
       })
       .catch((e) => {
         throw e
       })
   } catch (e) {
-    logger.error(e)
+    console.log(e)
     res.json(false)
   } finally {
     if (client) client.release()
@@ -357,18 +360,21 @@ app.post(connectPathDeleteRecordsManagement, async (req, res) => {
   const client = await pool.connect()
   const input: string = req.body.key
 
+  console.log(input)
+
   try {
     // 取引管理テーブル更新
     await client
       .query(sql.deleteRecordManagement.query, [input])
       .then(() => {
+        console.log('DB:delete complete')
         res.json(true)
       })
       .catch((e) => {
         throw e
       })
   } catch (e) {
-    logger.error(e)
+    console.log(e)
     res.json(false)
   } finally {
     if (client) client.release()
@@ -380,6 +386,8 @@ app.post(connectPathInsertClientCost, async (req, res) => {
   const client = await pool.connect()
   const input: ClientsAndCosts = req.body.key
 
+  console.log(input)
+
   try {
     await client
       .query(sql.insertClientCost.query, [
@@ -390,13 +398,15 @@ app.post(connectPathInsertClientCost, async (req, res) => {
         input.color,
       ])
       .then(() => {
+        console.log('DB:insert complete')
         res.json(true)
+        // console.log('userInfo', input.userInfo)
       })
       .catch((e) => {
         throw e
       })
   } catch (e) {
-    logger.error(e)
+    console.log(e)
     res.json(false)
   } finally {
     if (client) client.release()
@@ -408,17 +418,21 @@ app.post(connectPathUpdateClientCost, async (req, res) => {
   const client = await pool.connect()
   const input: ClientsAndCosts = req.body.key
 
+  console.log('ClientCost', input)
+
   try {
     await client
       .query(sql.updateClientCost.query, [input.name, input.color, input.id])
       .then(() => {
+        console.log('DB:update complete')
         res.json(true)
+        // console.log('userInfo', input.userInfo)
       })
       .catch((e) => {
         throw e
       })
   } catch (e) {
-    logger.error(e)
+    console.log(e)
     res.json(false)
   } finally {
     if (client) client.release()
@@ -430,18 +444,21 @@ app.post(connectPathDeleteClientCost, async (req, res) => {
   const client = await pool.connect()
   const input: string = req.body.key
 
+  console.log(input)
+
   try {
     // 取引先固定経費テーブル更新
     await client
       .query(sql.deleteClientCost.query, [input])
       .then(() => {
+        console.log('DB:delete complete')
         res.json(true)
       })
       .catch((e) => {
         throw e
       })
   } catch (e) {
-    logger.error(e)
+    console.log(e)
     res.json(false)
   } finally {
     if (client) client.release()
@@ -463,12 +480,13 @@ app.post(connectPathChangeYearRecordsManagement, async (req, res) => {
       ])
       .then((result) => {
         res.json(result.rows)
+        // console.log('userRecordsManagement', input.userRecordsManagement)
       })
       .catch((e) => {
         throw e
       })
   } catch (e) {
-    logger.error(e)
+    console.log(e)
     res.json(false)
   } finally {
     if (client) client.release()
@@ -514,6 +532,7 @@ app.post(connectPathChangeWorksRecordsManagement, async (req, res) => {
       ])
       .then((result) => {
         input.workRecordsManagement = result.rows
+        // console.log('userRecordsManagement', input.userRecordsManagement)
       })
       .catch((e) => {
         throw e
@@ -524,6 +543,7 @@ app.post(connectPathChangeWorksRecordsManagement, async (req, res) => {
       .query(sql.clientsAndCostsInfo.query, [inputWid])
       .then((result) => {
         input.clientsAndCostsInfo = result.rows
+        // console.log('userRecordsManagement', input.userRecordsManagement)
       })
       .catch((e) => {
         throw e
@@ -531,10 +551,9 @@ app.post(connectPathChangeWorksRecordsManagement, async (req, res) => {
 
     // 事業所テーブルにおいて、選択した事業所の最終選択時刻を更新
     await client.query(sql.updateWorkLastTime.query, [inputNow, inputWid])
-
     res.json(input)
   } catch (e) {
-    logger.error(e)
+    console.log(e)
     res.json(false)
   } finally {
     if (client) client.release()

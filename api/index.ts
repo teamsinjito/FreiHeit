@@ -1,3 +1,4 @@
+import http from 'http'
 import express from 'express'
 import { config } from 'dotenv'
 import pg from 'pg'
@@ -44,8 +45,10 @@ configure({
   categories: { default: { appenders: ['app'], level: 'error' } },
 })
 const logger = getLogger()
+
 app.set('port', process.env.PORT || 8083)
-app.listen(app.get('port'))
+const server = http.createServer(app)
+server.listen(app.get('port'))
 app.use(express.json())
 
 app.post(connectDefaultWorks, async (req: Request, res) => {

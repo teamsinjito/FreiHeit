@@ -4,7 +4,7 @@
     <!-- 会社名 -->
     <v-list-item class="px-2 my-sm-1">
       <v-list-item-avatar color="primary">
-        <v-icon>mdi-home-city</v-icon>
+        <v-img src="/freiheit_logo.png" alt="FreiHeit Logo"></v-img>
       </v-list-item-avatar>
 
       <v-list-item-title
@@ -42,14 +42,7 @@
   </v-navigation-drawer>
 </template>
 <script lang="ts">
-import {
-  defineComponent,
-  onBeforeMount,
-  onMounted,
-  reactive,
-  ref,
-  toRefs,
-} from '@vue/composition-api'
+import { defineComponent, reactive, toRefs } from '@vue/composition-api'
 import { Works } from '../../composables/interface'
 import { useGlobalState } from '~/composables/useDefault'
 export default defineComponent({
@@ -75,9 +68,7 @@ export default defineComponent({
     }>({
       currentOffice: props.office.id,
     })
-    // onMounted(() => {
-    //   state.currentOffice = props.office
-    // })
+
     const items = [
       {
         icon: 'mdi-apps',
@@ -112,7 +103,6 @@ export default defineComponent({
     ]
 
     const changeCarrentWork = () => {
-      console.log('事業所切り替え', state.currentOffice)
       userState.changeWorksRecordsManagement(state.currentOffice)
     }
 

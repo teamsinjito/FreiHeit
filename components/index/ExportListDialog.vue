@@ -184,7 +184,6 @@ export default defineComponent({
       state.headerArray1 = headerArray1
       state.headerArray2 = headerArray2
       state.headerArray3 = headerArray3
-      console.log('ヘッダー生成完了')
     }
 
     // PDF作成
@@ -207,22 +206,25 @@ export default defineComponent({
       const docDefinition = {
         pageSize: 'A4',
         pageOrientation: 'landscape',
-        pageMargins: [5, 20, 10, 20],
+        pageMargins: [5, 20, 5, 20],
         footer: (currentPage: number, pageCount: number) => {
-          return currentPage.toString() + ' of ' + pageCount
+          return {
+            fontSize: 8,
+            text: currentPage.toString() + ' / ' + pageCount,
+          }
         },
         content: [
           {
             style: { color: 'black', fontSize: 6 },
             table: {
               headerRows: 3,
-              // width: state.headerWidth,
               width: 'auto',
               body: [
                 state.headerArray1,
                 state.headerArray2,
                 state.headerArray3,
               ],
+              pageBreak: 'after',
             },
           },
         ],
@@ -242,10 +244,24 @@ export default defineComponent({
 
       // 月毎にループ
       state.pdfFormatDataList.forEach((s, idx) => {
-        console.log(state.headerArray1)
         const lett: { text: string; fillColor: string }[] = []
         let fillColorCode = ''
         let rowNum = 0
+        if (idx === 0) {
+          const dummy: { text: string }[] = []
+          dummy.push({ text: '' })
+          dummy.push({ text: '' })
+          for (let index = 0; index < state.subjectList.length; index++) {
+            dummy.push({ text: '' })
+          }
+          docDefinition.content.forEach((d) => {
+            d.table?.body.push(
+              dummy.map((v) => {
+                return { text: v.text }
+              })
+            )
+          })
+        }
         if (idx !== state.pdfFormatDataList.length - 1) {
           // 日毎
           state.pdfFormatDataList[idx].list.forEach((li) => {
@@ -384,18 +400,11 @@ export default defineComponent({
           }
           docDefinition.content.forEach((d) => {
             d.table?.body.push(
-              lett.map((v, index) => {
-                if (index < 3) {
-                  return {
-                    text: v.text,
-                    fillColor: v.fillColor,
-                    pageBreak: 'after',
-                  }
-                } else {
-                  return {
-                    text: v.text,
-                    border: [false, false, false, false],
-                  }
+              lett.map((v) => {
+                return {
+                  text: v.text,
+                  border: [true, false, true, false],
+                  pageBreak: 'after',
                 }
               })
             )
@@ -438,17 +447,9 @@ export default defineComponent({
           }
           docDefinition.content.forEach((d) => {
             d.table?.body.push(
-              lett.map((v, index) => {
-                if (index < 3) {
-                  return {
-                    text: v.text,
-                    fillColor: v.fillColor,
-                  }
-                } else {
-                  return {
-                    text: v.text,
-                    border: [false, false, false, false],
-                  }
+              lett.map((v) => {
+                return {
+                  text: v.text,
                 }
               })
             )
@@ -460,6 +461,7 @@ export default defineComponent({
 
       // pdfMakeでのPDF出力
       pdfMake.createPdf(docDefinition as TDocumentDefinitions).download()
+      userState.snackBarDisplay('PDFの出力が完了しました', '')
 
       state.pdfFormatDataList = []
       state.dialog = false
@@ -585,11 +587,9 @@ export default defineComponent({
                     }
                   })
                 } else {
-                  console.log('in', data.pay)
                   const p = data.pay
                   const pos = datasSubject.position
                   c.costPays.push({ position: pos, pay: p })
-                  console.log(c)
                 }
               }
             })
@@ -625,7 +625,6 @@ export default defineComponent({
               }
             })
           } else {
-            // console.log(data.day.slice(5, 7) + data.day.slice(8, 10))
             // PDFフォーマットに沿って格納
             state.pdfFormatData.unshift({
               day: data.day,
@@ -670,7 +669,6 @@ export default defineComponent({
           c.costPays = []
         })
       })
-      console.log('トータル', state.pdfFormatDataList)
     }
     return {
       ...toRefs(state),

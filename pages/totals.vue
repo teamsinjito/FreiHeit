@@ -11,7 +11,7 @@
     ><v-divider></v-divider>
     <v-card flat rounded="0" class="mb-2 py-5">
       <v-row class="px-2">
-        <v-col>
+        <v-col offset-sm="8" sm="2">
           <v-checkbox
             v-model="otherCheck"
             hide-details
@@ -24,7 +24,7 @@
             </template>
           </v-checkbox>
         </v-col>
-        <v-col offset-sm="2">
+        <v-col sm="2">
           <v-select
             v-model="selectSubject"
             :items="subjectItems"

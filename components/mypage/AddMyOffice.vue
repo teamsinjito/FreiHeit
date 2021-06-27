@@ -18,6 +18,7 @@
       :title="title"
       :subtitle="subtitle"
       :continue-flg="true"
+      :cancel-flg="true"
       btn-name="登録"
       :default-records="newRecord"
       @exec="insertClientCost"
@@ -63,7 +64,6 @@ export default defineComponent({
     const insertClientCost = (record: InsertUpdateWorks, v: boolean) => {
       state.dialog = v
       useState.insertMyOffice(record)
-      // useState.insertClientCost(record)
     }
 
     return {

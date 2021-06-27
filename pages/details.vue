@@ -12,7 +12,7 @@
     ><v-divider></v-divider>
     <v-card flat rounded="0" class="mb-2 py-5">
       <v-row class="px-2">
-        <v-col offset-sm="8">
+        <v-col offset-sm="7">
           <v-select
             v-model="selectSubject"
             :items="subjectItems"
@@ -41,10 +41,10 @@
               <span class="text-caption">取引先および固定経費を選択</span>
             </template>
             <template #selection="{ item, index }">
-              <v-chip v-if="index === 0" class="text-caption">
-                <span>{{ item.name }}</span>
-              </v-chip>
-              <span v-if="index === 1" class="grey--text text-caption">
+              <span v-if="index === 0" class="text-caption">{{
+                item.name
+              }}</span>
+              <span v-if="index === 1" class="ml-3 grey--text text-caption">
                 (+{{ selectClientsAndCosts.length - 1 }} others)
               </span>
             </template>

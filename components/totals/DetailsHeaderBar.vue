@@ -63,7 +63,6 @@ export default defineComponent({
 
           {
             style: { color: 'black', fontSize: 8 },
-            // layout: 'lightHorizontalLines',
             table: {
               headerRows: 1,
               widths: [

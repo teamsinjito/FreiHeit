@@ -175,7 +175,7 @@ import UpdateMyOffice from '~/components/mypage/UpdateMyOffice.vue'
 import MyPageHeaderBar from '~/components/mypage/MyPageHeaderBar.vue'
 export default defineComponent({
   components: { MyPageHeaderBar, AddMyOffice, UpdateMyOffice },
-  setup(prop, context) {
+  setup(_, context) {
     const userState = useGlobalState()
     const pagePerCount = 20
     const state = reactive<{
@@ -211,7 +211,6 @@ export default defineComponent({
 
     onMounted(() => {
       filterItemWithCreatedAt()
-      console.log('timeLineData', state.timeLineData)
       pagingTimeLineData(1)
     })
     const filterItemWithCreatedAt = () => {
@@ -242,7 +241,6 @@ export default defineComponent({
         .name
     }
     const changePage = () => {
-      console.log(state.page)
       pagingTimeLineData(state.page)
     }
     return {

@@ -6,19 +6,28 @@
     <v-app-bar-title v-text="title"></v-app-bar-title>
     <v-spacer></v-spacer>
     <!-- ヘルプアイコン -->
-    <v-dialog v-model="helpShow" width="500">
+    <v-dialog v-model="helpShow" width="100%">
       <template #activator="{ on, attrs }">
-        <v-btn icon v-bind="attrs" v-on="on">
+        <v-btn icon v-bind="attrs" v-on="on" @click="setHelpInfo()">
           <v-icon>mdi-progress-question</v-icon>
         </v-btn>
       </template>
       <v-card>
-        <v-card-title color="primary"> 各画面の説明 </v-card-title>
-        <v-carousel v-model="carousel" light hide-delimiter-background>
-          <v-carousel-item v-for="n in 5" :key="n">
-            <v-sheet height="100%" tile>
-              <v-row class="fill-height" align="center" justify="center">
-                <v-img height="250" :src="`/help_${n}.png`"></v-img>
+        <v-card-title class="text-subtitle-1"> 取引登録の流れ </v-card-title>
+        <v-carousel v-model="carousel" height="100%" hide-delimiter-background>
+          <v-carousel-item v-for="(n, index) in helps" :key="index">
+            <v-sheet height="100%" light tile>
+              <v-row class="fill-height" align="center">
+                <v-col sm="8" cols="12">
+                  <v-img
+                    height="100%"
+                    width="100%"
+                    :src="`/${n.title}.png`"
+                  ></v-img>
+                </v-col>
+                <v-col sm="4" cols="12">
+                  <v-card-text class="text-caption">{{ n.body }}</v-card-text>
+                </v-col>
               </v-row>
             </v-sheet>
           </v-carousel-item>
@@ -117,6 +126,7 @@ export default defineComponent({
         view: boolean
       }
       helpShow: boolean
+      helps: { title: string; body: string }[]
       carousel: number
     }>({
       authUser: {
@@ -130,6 +140,7 @@ export default defineComponent({
       },
       helpShow: false,
       carousel: 0,
+      helps: [],
     })
     const userState = useGlobalState()
     const preYear = new Date().getFullYear() - 1
@@ -166,6 +177,12 @@ export default defineComponent({
     const switchNavVarCall = () => {
       context.emit('switch', !props.mini)
     }
+    const setHelpInfo = () => {
+      state.helps = []
+      userState.helpsInfo.value.forEach((h) => {
+        state.helps.push(h)
+      })
+    }
     const logoutWithAuth0 = () => {
       window.alert('ログアウトします')
       context.root.$auth.logout()
@@ -179,6 +196,7 @@ export default defineComponent({
       changeCarrentYear,
       switchNavVarCall,
       logoutWithAuth0,
+      setHelpInfo,
       userState,
     }
   },

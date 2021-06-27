@@ -77,6 +77,12 @@ export interface Details {
   cNameE: string
 }
 
+// ヘルプ
+export interface helps {
+  title: string
+  body: string
+}
+
 export interface StateInterface {
   workInfo: Works[] // ユーザ情報
   workRecordsManagement: RecordsManagement[] // 取引管理
@@ -85,6 +91,7 @@ export interface StateInterface {
   clientsAndCostsInfo: ClientsAndCosts[] // 取引先および固定経費一覧
   tabsInfo: { tab: string; content: string }[] // タブ情報
   snackInfo: { text: string; color: string; view: boolean } // スナックバー
+  helpsInfo: helps[] // ヘルプ
 }
 export interface WorkChange {
   workRecordsManagement: RecordsManagement[] // 取引管理
@@ -101,23 +108,15 @@ export interface pdfRecord {
 export interface pdfFormatRecord {
   day: string
   dayFormat: string
-  cName: string // clientsAndCosts
-  // cid: string // clientsAndCosts
+  cName: string
   nomalPays: pdfRecord[]
-  // pay: number
-  // position: number // SubjectsList
-  // costsPays: pdfRecord[]
-  // itemFlg: number // clientsAndCosts
 }
 export interface pdfFormatCost {
   cid: string
   cName: string
   costPays: pdfRecord[]
 }
-// export interface pdfFormatSubjectTotalPay {
-//   position: number
-//   sumPay: number
-// }
+
 export interface pdfFormatRecordList {
   month: number
   list: pdfFormatRecord[]

@@ -30,13 +30,13 @@ import { sql } from './sql'
 
 const env = process.env
 const app = express()
-pg.defaults.ssl = true
 export const pool = new pg.Pool({
   database: env.DB_DATABASE,
   user: env.DB_USERNAME,
   password: env.DB_PASSWORD,
   host: env.DB_HOST,
   port: Number(env.DB_PORT),
+  ssl: { rejectUnauthorized: false },
 })
 
 config()

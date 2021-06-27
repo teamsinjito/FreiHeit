@@ -1,4 +1,3 @@
-import http from 'http'
 import express from 'express'
 import { config } from 'dotenv'
 import pg from 'pg'
@@ -31,6 +30,7 @@ import { sql } from './sql'
 
 const env = process.env
 const app = express()
+pg.defaults.ssl = true
 export const pool = new pg.Pool({
   database: env.DB_DATABASE,
   user: env.DB_USERNAME,
@@ -38,6 +38,7 @@ export const pool = new pg.Pool({
   host: env.DB_HOST,
   port: Number(env.DB_PORT),
 })
+
 config()
 
 configure({

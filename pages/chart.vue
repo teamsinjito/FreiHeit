@@ -211,7 +211,7 @@ export default defineComponent({
         new Set(
           shapingData.map((data) => {
             // 「yyyy-mm-dd」型式の日付文字列「-dd」を削除
-            return data.day.substring(5, 7)
+            return data.day.substring(0, 7)
           })
         )
       ).sort()
@@ -252,7 +252,7 @@ export default defineComponent({
           })
           const targetCost = shapingTargetData
             .filter((data) => {
-              return data.day.substring(5, 7) === month
+              return data.day.substring(0, 7) === month
             })
             .map((val) => {
               return val.pay

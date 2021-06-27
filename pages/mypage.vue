@@ -117,7 +117,7 @@
                               <span
                                 class="font-weight-bold text-sm-caption"
                                 style="font-size: 0.4rem"
-                                >摘要：{{ item.note }}
+                                >取引内訳：{{ getClientAndCostName(item.cid) }}
                               </span>
                             </v-col>
                             <v-col
@@ -175,7 +175,7 @@ import UpdateMyOffice from '~/components/mypage/UpdateMyOffice.vue'
 import MyPageHeaderBar from '~/components/mypage/MyPageHeaderBar.vue'
 export default defineComponent({
   components: { MyPageHeaderBar, AddMyOffice, UpdateMyOffice },
-  setup(prop, context) {
+  setup(_, context) {
     const userState = useGlobalState()
     const pagePerCount = 20
     const state = reactive<{
@@ -211,7 +211,6 @@ export default defineComponent({
 
     onMounted(() => {
       filterItemWithCreatedAt()
-      console.log('timeLineData', state.timeLineData)
       pagingTimeLineData(1)
     })
     const filterItemWithCreatedAt = () => {
@@ -237,8 +236,11 @@ export default defineComponent({
     const getSubjectName = (m: string) => {
       return userState.subjectsInfo.value.filter((s) => s.id === m)[0].name
     }
+    const getClientAndCostName = (m: string) => {
+      return userState.clientsAndCostsInfo.value.filter((s) => s.id === m)[0]
+        .name
+    }
     const changePage = () => {
-      console.log(state.page)
       pagingTimeLineData(state.page)
     }
     return {
@@ -246,6 +248,7 @@ export default defineComponent({
       userState,
       filterItemWithCreatedAt,
       getSubjectName,
+      getClientAndCostName,
       changePage,
     }
   },

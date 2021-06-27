@@ -41,7 +41,12 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="blue darken-1" text @click="cancelDialog()">
+        <v-btn
+          v-if="cancelFlg"
+          color="blue darken-1"
+          text
+          @click="cancelDialog()"
+        >
           キャンセル
         </v-btn>
         <v-btn color="blue darken-1" text @click="execClientCost()">
@@ -71,6 +76,10 @@ export default defineComponent({
       required: true,
     },
     continueFlg: {
+      type: Boolean,
+      required: true,
+    },
+    cancelFlg: {
       type: Boolean,
       required: true,
     },
@@ -117,7 +126,6 @@ export default defineComponent({
     const execClientCost = () => {
       // バリデーションチェック
       if (!form.value.validate()) {
-        console.log('validation error!')
         return
       }
 
@@ -133,12 +141,17 @@ export default defineComponent({
       )
     }
     const deleteRecord = () => {
-      if (
-        confirm(
-          '削除してもよろしいですか？ 登録してある取引や取引先、固定経費も全て削除されます。'
-        )
-      ) {
-        userState.deleteMyOffice(state.id)
+      if (userState.workInfo.value.length > 1) {
+        if (
+          confirm(
+            '削除してもよろしいですか？ 登録してある取引や取引先、固定経費も全て削除されます。'
+          )
+        ) {
+          userState.deleteMyOffice(state.id)
+          context.emit('open-close', !props.dialog)
+        }
+      } else {
+        userState.snackBarDisplay('事業所は1件以上登録してください', 'warning')
         context.emit('open-close', !props.dialog)
       }
     }

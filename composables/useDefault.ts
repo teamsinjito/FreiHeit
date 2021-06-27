@@ -92,6 +92,14 @@ const createGlobalState = (userId: string) => {
       color: '',
       view: false,
     },
+
+    // ヘルプ
+    helpsInfo: [
+      {
+        title: '',
+        body: '',
+      },
+    ],
   })
 
   // オーバーレイ用情報
@@ -117,14 +125,13 @@ const createGlobalState = (userId: string) => {
       })
       .then((data) => {
         if (data.data != null) {
-          console.log('data.data', data.data.workRecordsManagement)
           globalState.workInfo = data.data.workInfo
           globalState.workRecordsManagement = data.data.workRecordsManagement
           globalState.subjectsInfo = data.data.subjectsInfo
           globalState.clientsAndCostsInfo = data.data.clientsAndCostsInfo
           globalState.tabsInfo = data.data.tabsInfo
+          globalState.helpsInfo = data.data.helpsInfo
           displayState.displayShow = true
-          console.log('初期処理：成功!')
         } else {
           alert('初期処理に失敗しました。')
         }
@@ -145,7 +152,6 @@ const createGlobalState = (userId: string) => {
         if (res.data) {
           globalState.workInfo.push({ id: ary.id, name: ary.name, last: '' })
 
-          console.log('事業所追加：成功!')
           snackBarDisplay('事業所の登録が正常に完了しました。', '')
         } else {
           snackBarDisplay('事業所の登録が失敗しました。', 'error')
@@ -166,7 +172,6 @@ const createGlobalState = (userId: string) => {
           const row = globalState.workInfo.filter((r) => r.id === ary.id)[0]
           row.name = ary.name
 
-          console.log('事業所更新：成功!')
           snackBarDisplay('事業所の更新が正常に完了しました。', '')
         } else {
           snackBarDisplay('事業所の更新が失敗しました。', 'error')
@@ -195,7 +200,6 @@ const createGlobalState = (userId: string) => {
             (r) => r.wid !== id
           )
 
-          console.log('事業所削除：成功!')
           snackBarDisplay('事業所の削除が正常に完了しました。', '')
         } else {
           snackBarDisplay('事業所の削除が失敗しました。', 'error')
@@ -226,7 +230,6 @@ const createGlobalState = (userId: string) => {
             }
             return 0
           })
-          console.log('取引追加：成功!')
           snackBarDisplay('取引の登録が正常に完了しました。', '')
         } else {
           snackBarDisplay('取引の登録が失敗しました。', 'error')
@@ -265,7 +268,6 @@ const createGlobalState = (userId: string) => {
             }
             return 0
           })
-          console.log('取引更新：成功!')
           snackBarDisplay('取引の更新が正常に完了しました。', '')
         } else {
           snackBarDisplay('取引の更新が失敗しました。', 'error')
@@ -287,7 +289,6 @@ const createGlobalState = (userId: string) => {
             (r) => r.id !== id
           )
 
-          console.log('取引削除：成功!')
           snackBarDisplay('取引の削除が正常に完了しました。', '')
         } else {
           snackBarDisplay('取引の削除が失敗しました。', 'error')
@@ -300,6 +301,10 @@ const createGlobalState = (userId: string) => {
 
   // 取引先もしくは固定経費追加
   const insertClientCost = async (ary: ClientsAndCosts) => {
+    if (ary.name.trim() === '') {
+      snackBarDisplay('取引内訳の登録に入力してください', '')
+      return
+    }
     // uuid生成
     ary.id = uuidv4()
     await axios
@@ -310,23 +315,19 @@ const createGlobalState = (userId: string) => {
         if (res.data) {
           globalState.clientsAndCostsInfo.push(ary)
 
-          console.log(globalState.clientsAndCostsInfo)
-          if (ary.iflg === 1) {
-            console.log('取引先追加：成功!')
+          if (ary.iflg === 0) {
             snackBarDisplay('取引先の登録が正常に完了しました。', '')
+          } else if (ary.iflg === 1) {
+            snackBarDisplay('品目の登録が正常に完了しました。', '')
           } else {
-            console.log(ary)
-            console.log('固定経費追加：成功!')
             snackBarDisplay('固定経費の登録が正常に完了しました。', '')
           }
         }
       })
       .catch(() => {
         if (ary.iflg === 1) {
-          console.log('取引先追加：失敗!')
           snackBarDisplay('取引先の登録が失敗しました。', '')
         } else {
-          console.log('固定経費追加：失敗!')
           snackBarDisplay('固定経費の登録が失敗しました。', '')
         }
       })
@@ -347,22 +348,16 @@ const createGlobalState = (userId: string) => {
           row.color = ary.color
 
           if (ary.iflg === 1) {
-            console.log('取引先更新：成功!')
             snackBarDisplay('取引先の更新が正常に完了しました。', '')
           } else {
-            console.log(ary)
-            console.log('固定経費更新：成功!')
             snackBarDisplay('固定経費の更新が正常に完了しました。', '')
           }
         }
       })
       .catch(() => {
         if (ary.iflg === 1) {
-          console.log('取引先更新：失敗!')
           snackBarDisplay('取引先の更新が失敗しました。', 'error')
         } else {
-          console.log(ary)
-          console.log('固定経費更新：失敗!')
           snackBarDisplay('固定経費の更新が失敗しました。', 'error')
         }
       })
@@ -381,20 +376,16 @@ const createGlobalState = (userId: string) => {
           )
 
           if (flg === 1) {
-            console.log('取引先削除：成功!')
             snackBarDisplay('取引先の削除が正常に完了しました。', '')
           } else {
-            console.log('固定経費削除：成功!')
             snackBarDisplay('固定経費の削除が正常に完了しました。', '')
           }
         }
       })
       .catch(() => {
         if (flg === 1) {
-          console.log('取引先削除：失敗!')
           snackBarDisplay('取引先の削除が失敗しました。', 'error')
         } else {
-          console.log('固定経費削除：失敗!')
           snackBarDisplay('固定経費の削除が失敗しました。', 'error')
         }
       })
@@ -527,7 +518,6 @@ export const getDefaultWork = (authId: string): Promise<Works> =>
           })
         } else {
           reject(new Error('NG'))
-          alert('初期処理に失敗しました。')
         }
       })
       .catch(() => {

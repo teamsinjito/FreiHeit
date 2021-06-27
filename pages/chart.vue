@@ -144,8 +144,7 @@ export default defineComponent({
       sliderStart: 1,
       sliderEnd: 12,
       selectSubject: '仕入',
-      // 【Todo】ここはstateから参照すること
-      subjectItems: ['売上', '雑収入等', '仕入', '経費'],
+      subjectItems: [],
       barChartData: undefined,
       pieChartData: undefined,
     })
@@ -166,6 +165,17 @@ export default defineComponent({
         return false
       }
     })
+
+    const setSubjects = () => {
+      const items = globalState.subjectsInfo.value.reduce(
+        (ary: string[], g) => {
+          ary.push(g.groupname)
+          return ary
+        },
+        []
+      )
+      state.subjectItems = [...new Set(items)]
+    }
 
     const getFilteringData = () => {
       // *********************************************************************
@@ -302,6 +312,7 @@ export default defineComponent({
     }
 
     onMounted(() => {
+      setSubjects()
       getFilteringData()
     })
 

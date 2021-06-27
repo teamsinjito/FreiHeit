@@ -17,6 +17,7 @@ import { defineComponent } from '@vue/composition-api'
 import { Totals } from '@/composables/interface'
 import pdfMake from 'pdfmake/build/pdfmake'
 import '@/static/vfs_fonts.js'
+import { TDocumentDefinitions } from 'pdfmake/interfaces'
 export default defineComponent({
   props: {
     records: {
@@ -58,7 +59,6 @@ export default defineComponent({
           },
           {
             style: { color: 'black', fontSize: 8 },
-            // layout: 'lightHorizontalLines',
             table: {
               headerRows: 1,
               widths: [
@@ -181,7 +181,7 @@ export default defineComponent({
       })
 
       // pdfMakeでのPDF出力
-      pdfMake.createPdf(docDefinition).download()
+      pdfMake.createPdf(docDefinition as TDocumentDefinitions).download()
     }
 
     return { print }

@@ -81,7 +81,7 @@
                         <span
                           class="font-weight-bold text-sm-caption"
                           style="font-size: 0.4rem"
-                          >摘要：{{ item.note }}
+                          >取引内訳：{{ getClientAndCostName(item.cid) }}
                         </span>
                       </th>
                       <!-- 金額,編集アイコン -->
@@ -183,17 +183,13 @@
 </template>
 
 <script lang="ts">
-import {
-  defineComponent,
-  reactive,
-  toRefs,
-  computed,
-} from '@nuxtjs/composition-api'
+import { defineComponent, reactive, toRefs } from '@nuxtjs/composition-api'
 import { useGlobalState } from '../composables/useDefault'
 import UpdateCashDialog from '~/components/index/UpdateCashDialog.vue'
+import IndexHeaderBar from '~/components/index/IndexHeaderBar.vue'
 
 export default defineComponent({
-  components: { UpdateCashDialog },
+  components: { UpdateCashDialog, IndexHeaderBar },
 
   setup() {
     const userState = useGlobalState()
@@ -201,13 +197,23 @@ export default defineComponent({
     const state = reactive<{
       tab: string
       singleExpand: boolean
-
+      subjectList: {
+        id: string
+        name: string
+        pay: number
+      }[]
       carryOver: number
       switchFlg: boolean
     }>({
       tab: '',
       singleExpand: true,
-
+      subjectList: [
+        {
+          id: '',
+          name: '',
+          pay: 0,
+        },
+      ],
       carryOver: 0,
       switchFlg: true,
     })
@@ -217,6 +223,10 @@ export default defineComponent({
     ]
     const getSubjectName = (m: string) => {
       return userState.subjectsInfo.value.filter((s) => s.id === m)[0].name
+    }
+    const getClientAndCostName = (m: string) => {
+      return userState.clientsAndCostsInfo.value.filter((s) => s.id === m)[0]
+        .name
     }
     const filterItemWithMonth = (m: string) => {
       return userState.workRecordsManagement.value.filter((r) =>
@@ -245,12 +255,7 @@ export default defineComponent({
         }
       })
       totals.push({ name: carryOverName, pay: carryOver })
-      // totals.forEach((element) => {
-      //   const f = userState.subjectsInfo.value.filter((r) =>
-      //     r.name.includes(element.name)
-      //   )[0]
-      //   state.carryOver = state.carryOver + element.pay * f.payflg
-      // })
+
       return totals
     }
 
@@ -259,6 +264,7 @@ export default defineComponent({
       carryOverName,
       headers,
       getSubjectName,
+      getClientAndCostName,
       userState,
       filterItemWithMonth,
       filterAndMergeItemWithMonth,

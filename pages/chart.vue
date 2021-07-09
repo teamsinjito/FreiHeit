@@ -295,7 +295,7 @@ export default defineComponent({
         backgroundColor: '#d3d3d3',
       }
 
-      state.targetData.forEach((item, index) => {
+      state.targetData.forEach((item) => {
         const chartLabel = item.name
 
         const targetMonthData = targetMonth.map((month) => {
@@ -323,31 +323,47 @@ export default defineComponent({
 
         const chartBackgroundColor = item.color
 
-        // その他に纏める用のチェックボックスに入っているかで値のセット方法を変更
-        if (!state.otherCheck || (state.otherCheck && index < 4)) {
-          // 以下パターンの時は以下の処理を実施
-          // ①チェックがOffの時(「その他」で纏めない時)
-          // ②チェックがOnかつ対象データが4件目以内の時(５件目以降から「その他」で纏めるため)
-          state.chartData.push({
-            label: chartLabel,
-            data: targetMonthData,
-            backgroundColor: chartBackgroundColor,
-          })
-        } else if (state.otherCheck && index >= 4) {
-          // 初回時は「otherChartData.data」が空なのでpushで追加
-          if (otherChartData.data.length === 0) {
-            otherChartData.data = targetMonthData
-          } else {
-            // 既にデータが存在している際は、その値に加算していく
-            otherChartData.data.forEach((_, index) => {
-              otherChartData.data[index] += targetMonthData[index]
-            })
-          }
-        }
+        state.chartData.push({
+          label: chartLabel,
+          data: targetMonthData,
+          backgroundColor: chartBackgroundColor,
+        })
       })
 
-      if (state.otherCheck && otherChartData.data.length > 0) {
-        state.chartData.push(otherChartData)
+      if (state.otherCheck) {
+        // 金額順に並び替え
+        state.chartData.sort((a, b) => {
+          return (
+            b.data.reduce((prev, current) => prev + current, 0) -
+            a.data.reduce((prev, current) => prev + current, 0)
+          )
+        })
+
+        // その他データ生成
+        state.chartData.forEach((data, index) => {
+          if (index >= 4) {
+            // 初回時は「otherChartData.data」が空なのでpushで追加
+            if (otherChartData.data.length === 0) {
+              otherChartData.data = data.data
+            } else {
+              // 既にデータが存在している際は、その値に加算していく
+              otherChartData.data.forEach((_, index) => {
+                otherChartData.data[index] += data.data[index]
+              })
+            }
+            delete state.chartData[index]
+          }
+        })
+
+        // その他データに使用したものを省く
+        state.chartData = state.chartData.filter((_, index) => {
+          return index < 4
+        })
+
+        // その他データ追加
+        if (otherChartData.data.length > 0) {
+          state.chartData.push(otherChartData)
+        }
       }
 
       const barChartData = {

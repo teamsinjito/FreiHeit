@@ -179,12 +179,100 @@
         </v-tab-item>
       </v-tabs-items>
     </v-card>
+    <v-row class="mt-5">
+      <v-expansion-panels v-model="panel" focusable>
+        <v-col cols="12">
+          <v-expansion-panel :key="0">
+            <v-expansion-panel-header color="primary" class="white--text"
+              >取引登録履歴
+            </v-expansion-panel-header>
+            <v-expansion-panel-content class="pt-5">
+              <v-timeline dense>
+                <v-timeline-item
+                  v-for="item in timeLineDataPerPage"
+                  :key="item.id"
+                  small
+                >
+                  <v-card class="elevation-2">
+                    <v-card-title
+                      class="text-sm-caption"
+                      style="background: #eeeeee; font-size: 0.25rem;!important"
+                    >
+                      {{
+                        item.day.slice(0, 4) +
+                        '年' +
+                        item.day.slice(5, 7) +
+                        '月' +
+                        item.day.slice(8, 10) +
+                        '日'
+                      }}
+                    </v-card-title>
+                    <v-card-text>
+                      <v-row>
+                        <v-col cols="12" md="8">
+                          <span
+                            class="font-weight-bold text-sm-caption"
+                            style="font-size: 0.4rem"
+                            >勘定科目：{{ getSubjectName(item.sid) }}
+                          </span>
+                          <br />
+                          <span
+                            class="font-weight-bold text-sm-caption"
+                            style="font-size: 0.4rem"
+                            >取引内訳：{{ getClientAndCostName(item.cid) }}
+                          </span>
+                        </v-col>
+                        <v-col
+                          cols="12"
+                          md="4"
+                          class="text-right"
+                          style="align-self: center"
+                        >
+                          <span
+                            class="text-sm-caption font-weight-bold"
+                            style="font-size: 0.4rem"
+                            >{{ Number(item.pay).toLocaleString() }} 円
+                          </span></v-col
+                        >
+                      </v-row>
+                      <v-divider></v-divider>
+                      <v-row class="mt-1">
+                        <v-col cols="12" class="text-right">
+                          <span
+                            class="text-sm-caption"
+                            style="font-size: 0.4rem"
+                            >{{ item.update }} | 更新日時</span
+                          >
+                        </v-col>
+                      </v-row>
+                    </v-card-text>
+                  </v-card>
+                </v-timeline-item>
+              </v-timeline>
+              <v-pagination
+                v-model="page"
+                :length="maxLength"
+                :total-visible="7"
+                @input="changePage()"
+              ></v-pagination>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+        </v-col>
+      </v-expansion-panels>
+    </v-row>
   </v-sheet>
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs } from '@nuxtjs/composition-api'
+import {
+  defineComponent,
+  onMounted,
+  reactive,
+  toRefs,
+  watch,
+} from '@nuxtjs/composition-api'
 import { useGlobalState } from '../composables/useDefault'
+import { RecordsManagement } from '../composables/interface'
 import UpdateCashDialog from '~/components/index/UpdateCashDialog.vue'
 import IndexHeaderBar from '~/components/index/IndexHeaderBar.vue'
 
@@ -194,6 +282,11 @@ export default defineComponent({
   setup() {
     const userState = useGlobalState()
     const carryOverName = '繰越金'
+    const headers = [
+      { text: 'data', value: 'subject', align: 'start' },
+      { text: 'money', value: 'pay', align: 'right' },
+    ]
+    const pagePerCount = 10
     const state = reactive<{
       tab: string
       singleExpand: boolean
@@ -203,9 +296,15 @@ export default defineComponent({
         pay: number
       }[]
       carryOver: number
+      page: number
+      maxLength: number
       switchFlg: boolean
+      panel: number
+      timeLineData: RecordsManagement[]
+      timeLineDataPerPage: RecordsManagement[]
     }>({
       tab: '',
+      panel: 0,
       singleExpand: true,
       subjectList: [
         {
@@ -215,12 +314,46 @@ export default defineComponent({
         },
       ],
       carryOver: 0,
+      page: 1,
+      maxLength: Math.ceil(
+        userState.workRecordsManagement.value.length / pagePerCount
+      ),
       switchFlg: true,
+      timeLineData: [],
+      timeLineDataPerPage: [],
     })
-    const headers = [
-      { text: 'data', value: 'subject', align: 'start' },
-      { text: 'money', value: 'pay', align: 'right' },
-    ]
+
+    onMounted(() => {
+      filterItemWithCreatedAt()
+      pagingTimeLineData(1)
+    })
+    watch(userState.workRecordsManagement, () => {
+      filterItemWithCreatedAt()
+      pagingTimeLineData(1)
+    })
+    const filterItemWithCreatedAt = () => {
+      state.timeLineData = userState.workRecordsManagement.value.concat()
+      return state.timeLineData.sort((n1, n2) => {
+        if (n1.update > n2.update) {
+          return -1
+        }
+        if (n1.update < n2.update) {
+          return 1
+        }
+        return 0
+      })
+    }
+    const pagingTimeLineData = (page: number) => {
+      state.timeLineDataPerPage = state.timeLineData
+        .slice(
+          (page - 1) * pagePerCount,
+          (page - 1) * pagePerCount + pagePerCount
+        )
+        .concat()
+    }
+    const changePage = () => {
+      pagingTimeLineData(state.page)
+    }
     const getSubjectName = (m: string) => {
       return userState.subjectsInfo.value.filter((s) => s.id === m)[0].name
     }
@@ -268,6 +401,7 @@ export default defineComponent({
       userState,
       filterItemWithMonth,
       filterAndMergeItemWithMonth,
+      changePage,
     }
   },
 })

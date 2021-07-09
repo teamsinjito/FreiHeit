@@ -9,10 +9,7 @@
             }}</span>
           </v-col>
           <v-col cols="1" sm="1"
-            ><v-icon
-              v-if="!continueFlg"
-              class="white--text"
-              @click="deleteRecord"
+            ><v-icon v-if="deleteFlg" class="white--text" @click="deleteRecord"
               >mdi-trash-can-outline</v-icon
             ></v-col
           >
@@ -96,6 +93,10 @@ export default defineComponent({
       type: String,
       required: true,
     },
+    deleteFlg: {
+      type: Boolean,
+      required: true,
+    },
     continueFlg: {
       type: Boolean,
       required: true,
@@ -151,7 +152,6 @@ export default defineComponent({
     const execClientCost = () => {
       // バリデーションチェック
       if (!form.value.validate()) {
-        console.log('validation error!')
         return
       }
       // insert or update
@@ -159,7 +159,7 @@ export default defineComponent({
         'exec',
         {
           id: state.id,
-          wid: userState.workInfo.value[0].id,
+          wid: userState.workInfo.value.id,
           name: state.inputClientCost,
           iflg: props.iflg,
           color: state.inputColor,

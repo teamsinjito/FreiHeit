@@ -118,7 +118,6 @@ export default defineComponent({
         text: string
       }[] = []
       const headerArray3: { text: string }[] = []
-
       // rowHeader1===========================================
       headerArray1.push({
         colSpan: 1,
@@ -147,7 +146,6 @@ export default defineComponent({
       for (let index = 3; index < state.subjectList.length - 1; index++) {
         headerArray1.push({ colSpan: 0, rowSpan: 1, text: '' })
       }
-
       // rowHeader1===========================================
 
       // rowHeader2===========================================
@@ -156,17 +154,19 @@ export default defineComponent({
           headerArray2.push({ colSpan: 1, text: '' })
         }
       })
-      headerArray2.push(
-        { colSpan: 1, text: '' },
-        { colSpan: 1, text: '' },
-        { colSpan: state.subjectList.length - 8, text: 'そ の 他 経 費' }
-      )
+      headerArray2.push({ colSpan: 1, text: '' }, { colSpan: 1, text: '' })
+      if (state.subjectList.length - 8 !== 0) {
+        headerArray2.push({
+          colSpan: state.subjectList.length - 8,
+          text: 'そ の 他 経 費',
+        })
+      }
+
       state.subjectList.forEach((subject, index) => {
         if (subject.reqFlg === 0 && index < state.subjectList.length - 1) {
           headerArray2.push({ colSpan: 0, text: '' })
         }
       })
-
       // rowHeader2===========================================
 
       // rowHeader3===========================================
@@ -188,9 +188,6 @@ export default defineComponent({
 
     // PDF作成
     const print = () => {
-      // ヘッダー行生成
-      pushRowHeader()
-
       pdfMake.fonts = {
         GenShin: {
           normal: 'GenShinGothic-Normal-Sub.ttf',

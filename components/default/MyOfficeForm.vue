@@ -8,14 +8,6 @@
               title
             }}</span>
           </v-col>
-          <v-col cols="1" sm="1"
-            ><v-icon
-              v-if="!continueFlg"
-              class="white--text"
-              @click="deleteRecord"
-              >mdi-trash-can-outline</v-icon
-            ></v-col
-          >
         </v-card-title>
       </v-toolbar>
       <v-card-text>
@@ -29,15 +21,6 @@
               :rules="nameRules"
             ></v-text-field></v-row
         ></v-container>
-        <small v-if="continueFlg">
-          <v-checkbox v-model="checkbox">
-            <template #label>
-              <span class="text-caption font-weight-bold"
-                >連続して登録する</span
-              >
-            </template>
-          </v-checkbox></small
-        >
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
@@ -58,7 +41,6 @@
 </template>
 <script lang="ts">
 import { defineComponent, ref, reactive, toRefs } from '@vue/composition-api'
-import { useGlobalState } from '../../composables/useDefault'
 import { Works } from '../../composables/interface'
 
 export default defineComponent({
@@ -75,15 +57,10 @@ export default defineComponent({
       type: String,
       required: true,
     },
-    continueFlg: {
-      type: Boolean,
-      required: true,
-    },
     cancelFlg: {
       type: Boolean,
       required: true,
     },
-
     btnName: {
       type: String,
       required: true,
@@ -114,7 +91,6 @@ export default defineComponent({
       inputMyOffice: props.defaultRecords.name,
     })
 
-    const userState = useGlobalState()
     const nameRules = [
       (v: string) => !!v || '※入力必須です',
       (v: string) => v.length <= 50 || '※50文字以下で入力してください',
@@ -140,28 +116,12 @@ export default defineComponent({
         state.checkbox
       )
     }
-    const deleteRecord = () => {
-      if (userState.workInfo.value.length > 1) {
-        if (
-          confirm(
-            '削除してもよろしいですか？ 登録してある取引や取引先、固定経費も全て削除されます。'
-          )
-        ) {
-          userState.deleteMyOffice(state.id)
-          context.emit('open-close', !props.dialog)
-        }
-      } else {
-        userState.snackBarDisplay('事業所は1件以上登録してください', 'warning')
-        context.emit('open-close', !props.dialog)
-      }
-    }
     return {
       ...toRefs(state),
       form,
       cancelDialog,
       nameRules,
       execClientCost,
-      deleteRecord,
     }
   },
 })

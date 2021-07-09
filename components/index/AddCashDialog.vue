@@ -1,6 +1,6 @@
 <template>
   <!-- Newボタン -->
-  <v-dialog v-model="dialog" max-width="500px">
+  <v-dialog v-model="dialog" persistent max-width="500px">
     <template #activator="{ on, attrs }">
       <v-btn
         color="primary"
@@ -45,7 +45,7 @@ export default defineComponent({
         wid: '',
         pay: 0,
         sid: '',
-        day: '',
+        day: useState.currentSysYear.value.num + '-01-01',
         cid: '',
         note: '',
         update: '',

@@ -1,11 +1,7 @@
 <template>
   <v-app v-if="userState.displayShow.value && !display">
     <!-- サイドバー -->
-    <nav-drawer
-      :mini="mini"
-      :work-info="userState.workInfo.value"
-      :office="office"
-    ></nav-drawer>
+    <nav-drawer :mini="mini" :office="userState.workInfo.value"></nav-drawer>
     <!-- ヘッダー -->
     <app-bar :mini="mini" @switch="switchNavVar"></app-bar>
 
@@ -40,7 +36,6 @@
         :dialog="display"
         title="事業所追加"
         subtitle="初めに事業所名称を入力してください"
-        :continue-flg="false"
         :cancel-flg="false"
         btn-name="登録"
         :default-records="newRecord"
@@ -79,29 +74,34 @@ export default defineComponent({
   middleware: 'userAuth',
 
   setup(_props, context) {
+    const drawerMini = () => {
+      if (window.innerWidth < 500) {
+        return true
+      } else {
+        return false
+      }
+    }
     const state = reactive<{
       mini: boolean // ナビゲーションドロワーの開閉状態
       office: {
         id: string
         name: string
-        last: string
       }
       display: boolean
       newRecord: Works
     }>({
-      mini: false,
+      mini: drawerMini(),
       office: {
         id: '',
         name: '',
-        last: '',
       },
       display: false,
       newRecord: {
         id: '',
         name: '',
-        last: '',
       },
     })
+
     getDefaultWork(context.root.$store.$auth.user.sub as string).then((r) => {
       state.office = r
       if (state.office.id === '') {
@@ -113,6 +113,7 @@ export default defineComponent({
     const userState = useGlobalState()
     // 関数群
     const switchNavVar = (m: boolean) => {
+      console.log(m)
       state.mini = m
     }
     const dialogOpenClose = (v: boolean) => {

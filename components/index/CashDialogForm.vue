@@ -70,10 +70,9 @@
                 outlined
                 required
                 :rules="payRules"
-                type="text"
+                type="number"
                 suffix="円"
                 dense
-                @input="repNumber"
                 ><template #[`label`]>
                   <label class="text-caption"
                     ><v-icon class="text-caption"
@@ -91,7 +90,7 @@
                     >：取引内訳（以下1つのみ入力）</span
                   ><span class="red--text ml-1">*</span>
                   <span v-if="validErrFlg" class="red--text ml-3"
-                    >※いづれか入力必須です</span
+                    >※いずれか入力必須です</span
                   >
                 </v-card-title>
                 <v-col cols="12" class="py-0">
@@ -329,7 +328,7 @@ export default defineComponent({
       if (num === 0) {
         userState.insertClientCost({
           id: '',
-          wid: userState.workInfo.value[0].id,
+          wid: userState.workInfo.value.id,
           name: state.inputClientAndCostValueAry[n],
           iflg: n,
           color: '#' + Math.floor(Math.random() * 16777215).toString(16),
@@ -362,7 +361,7 @@ export default defineComponent({
       valid: boolean
       id: string
       checkbox: boolean
-      inputPay: string
+      inputPay: number
       inputDate: string
       inputSubject: string
       inputClientAndCost: string
@@ -376,7 +375,7 @@ export default defineComponent({
       id: props.defaultRecords.id,
       checkbox: props.continueFlg,
       inputDate: props.defaultRecords.day,
-      inputPay: props.defaultRecords.pay.toLocaleString().toString(),
+      inputPay: props.defaultRecords.pay,
       inputSubject: props.defaultRecords.sid,
       inputClientAndCost: props.defaultRecords.cid,
       inputClientAndCostValue: '',
@@ -386,11 +385,11 @@ export default defineComponent({
       validErrFlg: false,
     })
     // 金額の3桁区切り変換
-    const repNumber = () => {
-      state.inputPay = Number(
-        state.inputPay.replaceAll(',', '')
-      ).toLocaleString()
-    }
+    // const repNumber = () => {
+    //   state.inputPay = Number(
+    //     state.inputPay.replaceAll(',', '')
+    //   ).toLocaleString()
+    // }
 
     const cancelDialog = () => {
       context.emit('open-close', !props.dialog)
@@ -409,8 +408,8 @@ export default defineComponent({
         'exec',
         {
           id: state.id,
-          wid: userState.workInfo.value[0].id,
-          pay: Number(state.inputPay.replaceAll(',', '')),
+          wid: userState.workInfo.value.id,
+          pay: state.inputPay,
           sid: state.inputSubject,
           day: state.inputDate,
           cid: state.inputClientAndCostValue,
@@ -441,7 +440,6 @@ export default defineComponent({
       userState,
       cancelDialog,
       execCash,
-      repNumber,
       deleteRecord,
     }
   },

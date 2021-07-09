@@ -19,7 +19,7 @@
       <v-card-actions>
         <v-row class="my-5">
           <v-col cols="12" class="text-center">
-            <v-btn rounded color="primary" dark @click="loginWithAuthZero">
+            <v-btn color="primary" dark @click="loginWithAuthZero">
               ログイン
             </v-btn>
           </v-col>

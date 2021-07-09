@@ -1,22 +1,12 @@
 export const sql = {
-  defaultWorkInfo: {
-    query: `select id,name,last_select_time as last from works where uid = $1 order by last_select_time desc LIMIT 1`,
-  },
-  updateWorkLastTime: {
-    query: 'update works set last_select_time = $1 where id = $2 ;',
-  },
   insertWork: {
     query: 'insert into works(id,uid,name) values($1,$2,$3);',
   },
   updateWork: {
     query: 'update works set name = $1 where id = $2 ;',
   },
-  deleteWork: {
-    query: 'delete from works where id = $1 ;',
-  },
   workInfo: {
-    query:
-      'select id,name from works where uid = $1 order by last_select_time desc',
+    query: 'select id,name from works where uid = $1',
   },
   userRecordsManagement: {
     query: `select 
@@ -70,6 +60,11 @@ export const sql = {
 
   deleteRecordManagement: {
     query: 'delete from records_managements where id = $1 ;',
+  },
+
+  checkUsedClientCost: {
+    query:
+      'select count(*) from records_managements where client_or_cost_id = $1 ;',
   },
 
   insertClientCost: {

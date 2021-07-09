@@ -4,7 +4,6 @@
 export interface Works {
   id: string
   name: string
-  last: string
 }
 export interface InsertUpdateWorks {
   id: string
@@ -84,7 +83,7 @@ export interface helps {
 }
 
 export interface StateInterface {
-  workInfo: Works[] // ユーザ情報
+  workInfo: Works // ユーザ情報
   workRecordsManagement: RecordsManagement[] // 取引管理
   subjectsInfo: Subjects[] // 勘定科目一覧
   currentSysYear: { num: number } // 現在の会計期間

@@ -7,16 +7,26 @@
         <v-img src="/freiheit_logo.png" alt="FreiHeit Logo"></v-img>
       </v-list-item-avatar>
 
-      <v-list-item-title
-        ><v-select
-          v-model="currentOffice"
-          :items="workInfo"
-          item-text="name"
-          item-value="id"
-          style="font-size: 0.9rem"
-          @change="changeCarrentWork()"
-        ></v-select
-      ></v-list-item-title>
+      <v-list-item-title>{{ userState.workInfo.value.name }}</v-list-item-title>
+      <v-spacer></v-spacer>
+      <v-dialog v-model="dialog" max-width="500px">
+        <template #activator="{ on, attrs }">
+          <v-icon class="ml-sm-3" v-bind="attrs" v-on="on">
+            mdi-square-edit-outline
+          </v-icon>
+        </template>
+        <my-office-form
+          v-if="dialog"
+          :dialog="dialog"
+          title="事業所名更新"
+          subtitle="事業所名称を編集できます"
+          :cancel-flg="true"
+          btn-name="更新"
+          :default-records="office"
+          @exec="updateClientCost"
+          @open-close="dialogOpenClose"
+        ></my-office-form>
+      </v-dialog>
     </v-list-item>
     <v-divider></v-divider>
 
@@ -43,16 +53,12 @@
 </template>
 <script lang="ts">
 import { defineComponent, reactive, toRefs } from '@vue/composition-api'
-import { Works } from '../../composables/interface'
+import { Works, InsertUpdateWorks } from '../../composables/interface'
 import { useGlobalState } from '~/composables/useDefault'
 export default defineComponent({
   props: {
     mini: {
       type: Boolean,
-      required: true,
-    },
-    workInfo: {
-      type: Array,
       required: true,
     },
     office: {
@@ -61,24 +67,21 @@ export default defineComponent({
     },
   },
 
-  setup(props: { mini: boolean; workInfo: Works[]; office: Works }) {
+  setup(props: { mini: boolean; office: Works }) {
     const userState = useGlobalState()
+    userState.workInfo.value = props.office
     const state = reactive<{
       currentOffice: string
+      dialog: boolean
     }>({
       currentOffice: props.office.id,
+      dialog: false,
     })
-
     const items = [
       {
         icon: 'mdi-apps',
         title: '取引管理',
         to: '/',
-      },
-      {
-        icon: 'mdi-home-account',
-        title: 'マイページ',
-        to: '/mypage',
       },
       {
         icon: 'mdi-table',
@@ -101,12 +104,20 @@ export default defineComponent({
         to: '/option',
       },
     ]
-
-    const changeCarrentWork = () => {
-      userState.changeWorksRecordsManagement(state.currentOffice)
+    const dialogOpenClose = (v: boolean) => {
+      state.dialog = v
     }
-
-    return { items, ...toRefs(state), changeCarrentWork }
+    const updateClientCost = (record: InsertUpdateWorks, v: boolean) => {
+      state.dialog = v
+      userState.updateMyOffice(record)
+    }
+    return {
+      items,
+      ...toRefs(state),
+      updateClientCost,
+      dialogOpenClose,
+      userState,
+    }
   },
 })
 </script>

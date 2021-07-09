@@ -82,7 +82,7 @@
                     <add-client-cost
                       title="品目追加"
                       subtitle="品目名称を入力してください"
-                      :iflg="clientNum"
+                      :iflg="itemNum"
                     ></add-client-cost>
                   </v-toolbar>
                   <v-divider></v-divider>
@@ -110,7 +110,7 @@
                           <update-client-cost
                             title="品目更新"
                             subtitle="品目名称を編集できます"
-                            :iflg="clientNum"
+                            :iflg="itemNum"
                             :default-record="item"
                           ></update-client-cost>
                         </th>
@@ -195,7 +195,8 @@ export default defineComponent({
   },
   setup() {
     const userState = useGlobalState()
-    const clientNum = 1
+    const clientNum = 0
+    const itemNum = 1
     const costNum = 2
     const state = reactive<{
       panel: number[]
@@ -212,6 +213,7 @@ export default defineComponent({
       userState,
       filterClientOrCost,
       clientNum,
+      itemNum,
       costNum,
       ...toRefs(state),
     }

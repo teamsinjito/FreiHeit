@@ -5,6 +5,28 @@
     <v-app-bar-nav-icon @click.stop="switchNavVarCall" />
     <v-app-bar-title v-text="title"></v-app-bar-title>
     <v-spacer></v-spacer>
+    <v-menu bottom min-width="200px" rounded offset-y>
+      <template #activator="{ on }">
+        <v-btn icon x-large v-on="on">
+          <v-avatar size="24">
+            <img :src="authUser.pic" :alt="authUser.name" />
+          </v-avatar>
+        </v-btn>
+      </template>
+      <v-card>
+        <v-list-item-content class="justify-center">
+          <v-list-item-title class="mx-auto text-center">
+            <v-avatar class="mb-4">
+              <img :src="authUser.pic" :alt="authUser.name" />
+            </v-avatar>
+            <h4>{{ authUser.name }}</h4>
+            <span class="text-caption mt-1">
+              {{ authUser.email }}
+            </span>
+          </v-list-item-title>
+        </v-list-item-content>
+      </v-card>
+    </v-menu>
     <!-- ヘルプアイコン -->
     <v-dialog v-model="helpShow" width="100%">
       <template #activator="{ on, attrs }">
@@ -14,7 +36,12 @@
       </template>
       <v-card>
         <v-card-title class="text-subtitle-1"> 取引登録の流れ </v-card-title>
-        <v-carousel v-model="carousel" height="100%" hide-delimiter-background>
+        <v-carousel
+          v-model="carousel"
+          height="100%"
+          hide-delimiters
+          hide-delimiter-background
+        >
           <v-carousel-item v-for="(n, index) in helps" :key="index">
             <v-sheet height="100%" light tile>
               <v-row class="fill-height" align="center">
@@ -25,7 +52,7 @@
                     :src="`/${n.title}.png`"
                   ></v-img>
                 </v-col>
-                <v-col sm="4" cols="12">
+                <v-col sm="3" cols="12">
                   <v-card-text class="text-caption">{{ n.body }}</v-card-text>
                 </v-col>
               </v-row>
@@ -72,18 +99,6 @@
           </v-list-item>
           <v-list-item>
             <v-list-item-icon>
-              <v-avatar height="24px" width="24px" min-width="24px"
-                ><img :src="authUser.pic" :alt="authUser.name"
-              /></v-avatar>
-            </v-list-item-icon>
-            <v-list-item-content>
-              <v-list-item-title style="font-size: 0.9rem">{{
-                authUser.name
-              }}</v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-          <v-list-item>
-            <v-list-item-icon>
               <v-icon>mdi-logout-variant</v-icon>
             </v-list-item-icon>
             <v-list-item-content>
@@ -119,6 +134,7 @@ export default defineComponent({
       authUser: {
         name: string
         pic: string
+        email: string
       }
       snack: {
         text: string
@@ -132,6 +148,7 @@ export default defineComponent({
       authUser: {
         name: '名無し',
         pic: 'mdi-account-settings',
+        email: '',
       },
       snack: {
         text: '',
@@ -146,13 +163,6 @@ export default defineComponent({
     const preYear = new Date().getFullYear() - 1
     const title = 'FreiHeit'
     const yearList = [
-      { num: 2013 },
-      { num: 2014 },
-      { num: 2015 },
-      { num: 2016 },
-      { num: 2017 },
-      { num: 2018 },
-      { num: 2019 },
       { num: 2020 },
       { num: 2021 },
       { num: 2022 },
@@ -164,11 +174,22 @@ export default defineComponent({
       { num: 2028 },
       { num: 2029 },
       { num: 2030 },
+      { num: 2031 },
+      { num: 2032 },
+      { num: 2033 },
+      { num: 2034 },
+      { num: 2035 },
+      { num: 2036 },
+      { num: 2037 },
+      { num: 2038 },
+      { num: 2039 },
+      { num: 2040 },
     ]
 
     onBeforeMount(() => {
       state.authUser.name = context.root.$store.$auth.user.name as string
       state.authUser.pic = context.root.$store.$auth.user.picture as string
+      state.authUser.email = context.root.$store.$auth.user.email as string
     })
 
     const changeCarrentYear = () => {

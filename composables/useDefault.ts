@@ -13,15 +13,14 @@ import {
   connectPathUsers,
   connectPathInsertWorks,
   connectPathUpdateWorks,
-  connectPathDeleteWorks,
   connectPathInsertRecordsManagement,
   connectPathUpdateRecordsManagement,
   connectPathDeleteRecordsManagement,
+  connectPathIsUsedClientCost,
   connectPathInsertClientCost,
   connectPathUpdateClientCost,
   connectPathDeleteClientCost,
   connectPathChangeYearRecordsManagement,
-  connectPathChangeWorksRecordsManagement,
 } from '../composables/routing'
 import {
   Works,
@@ -29,20 +28,16 @@ import {
   RecordsManagement,
   StateInterface,
   ClientsAndCosts,
-  WorkChange,
 } from '../composables/interface'
 
 const createGlobalState = (userId: string) => {
   // 状態
   const globalState = reactive<StateInterface>({
     // ユーザ情報
-    workInfo: [
-      {
-        id: '',
-        name: '',
-        last: '',
-      },
-    ],
+    workInfo: {
+      id: '',
+      name: '',
+    },
 
     // 取引管理
     workRecordsManagement: [
@@ -150,7 +145,7 @@ const createGlobalState = (userId: string) => {
       })
       .then((res) => {
         if (res.data) {
-          globalState.workInfo.push({ id: ary.id, name: ary.name, last: '' })
+          globalState.workInfo = { id: ary.id, name: ary.name }
 
           snackBarDisplay('事業所の登録が正常に完了しました。', '')
         } else {
@@ -169,8 +164,7 @@ const createGlobalState = (userId: string) => {
       })
       .then((res) => {
         if (res.data) {
-          const row = globalState.workInfo.filter((r) => r.id === ary.id)[0]
-          row.name = ary.name
+          globalState.workInfo = { id: ary.id, name: ary.name }
 
           snackBarDisplay('事業所の更新が正常に完了しました。', '')
         } else {
@@ -181,34 +175,7 @@ const createGlobalState = (userId: string) => {
         snackBarDisplay('事業所の更新が失敗しました。', 'error')
       })
   }
-  // 事業所削除
-  const deleteMyOffice = async (id: string) => {
-    await axios
-      .post(`/api${connectPathDeleteWorks}`, {
-        key: id,
-      })
-      .then((res) => {
-        if (res.data) {
-          globalState.workInfo = globalState.workInfo.filter((r) => r.id !== id)
 
-          // 取引管理state 削除
-          globalState.workRecordsManagement = globalState.workRecordsManagement.filter(
-            (r) => r.wid !== id
-          )
-
-          globalState.clientsAndCostsInfo = globalState.clientsAndCostsInfo.filter(
-            (r) => r.wid !== id
-          )
-
-          snackBarDisplay('事業所の削除が正常に完了しました。', '')
-        } else {
-          snackBarDisplay('事業所の削除が失敗しました。', 'error')
-        }
-      })
-      .catch(() => {
-        snackBarDisplay('事業所の削除が失敗しました。', 'error')
-      })
-  }
   // 取引管理追加
   const insertRecordManagement = async (ary: RecordsManagement) => {
     // uuid生成
@@ -299,6 +266,22 @@ const createGlobalState = (userId: string) => {
       })
   }
 
+  // 取引先固定経費が取引管理で使用されているか
+  const isUsedByRecordsManagement = (costId: string): Promise<String> =>
+    new Promise((resolve, reject) => {
+      axios
+        .post<String>(`/api${connectPathIsUsedClientCost}`, {
+          key: costId,
+        })
+        .then((res) => {
+          if (res.data != null) {
+            resolve(res.data)
+          } else {
+            reject(new Error('NG'))
+          }
+        })
+    })
+
   // 取引先もしくは固定経費追加
   const insertClientCost = async (ary: ClientsAndCosts) => {
     if (ary.name.trim() === '') {
@@ -322,13 +305,21 @@ const createGlobalState = (userId: string) => {
           } else {
             snackBarDisplay('固定経費の登録が正常に完了しました。', '')
           }
+        } else if (ary.iflg === 0) {
+          snackBarDisplay('取引先の登録が失敗しました。', 'error')
+        } else if (ary.iflg === 1) {
+          snackBarDisplay('品目の登録が失敗しました。', 'error')
+        } else {
+          snackBarDisplay('固定経費の登録が失敗しました。', 'error')
         }
       })
       .catch(() => {
-        if (ary.iflg === 1) {
-          snackBarDisplay('取引先の登録が失敗しました。', '')
+        if (ary.iflg === 0) {
+          snackBarDisplay('取引先の登録が失敗しました。', 'error')
+        } else if (ary.iflg === 1) {
+          snackBarDisplay('品目の登録が失敗しました。', 'error')
         } else {
-          snackBarDisplay('固定経費の登録が失敗しました。', '')
+          snackBarDisplay('固定経費の登録が失敗しました。', 'error')
         }
       })
   }
@@ -346,17 +337,26 @@ const createGlobalState = (userId: string) => {
 
           row.name = ary.name
           row.color = ary.color
-
-          if (ary.iflg === 1) {
+          if (ary.iflg === 0) {
             snackBarDisplay('取引先の更新が正常に完了しました。', '')
+          } else if (ary.iflg === 1) {
+            snackBarDisplay('品目の更新が正常に完了しました。', '')
           } else {
             snackBarDisplay('固定経費の更新が正常に完了しました。', '')
           }
+        } else if (ary.iflg === 0) {
+          snackBarDisplay('取引先の更新が失敗しました。', '')
+        } else if (ary.iflg === 1) {
+          snackBarDisplay('品目の更新が失敗しました。', 'error')
+        } else {
+          snackBarDisplay('固定経費の更新が失敗しました。', 'error')
         }
       })
       .catch(() => {
-        if (ary.iflg === 1) {
-          snackBarDisplay('取引先の更新が失敗しました。', 'error')
+        if (ary.iflg === 0) {
+          snackBarDisplay('取引先の更新が失敗しました。', '')
+        } else if (ary.iflg === 1) {
+          snackBarDisplay('品目の更新が失敗しました。', 'error')
         } else {
           snackBarDisplay('固定経費の更新が失敗しました。', 'error')
         }
@@ -374,17 +374,26 @@ const createGlobalState = (userId: string) => {
           globalState.clientsAndCostsInfo = globalState.clientsAndCostsInfo.filter(
             (r) => r.id !== id
           )
-
-          if (flg === 1) {
+          if (flg === 0) {
             snackBarDisplay('取引先の削除が正常に完了しました。', '')
+          } else if (flg === 1) {
+            snackBarDisplay('品目の削除が正常に完了しました。', '')
           } else {
             snackBarDisplay('固定経費の削除が正常に完了しました。', '')
           }
+        } else if (flg === 0) {
+          snackBarDisplay('取引先の削除が失敗しました。', 'error')
+        } else if (flg === 1) {
+          snackBarDisplay('品目の削除が失敗しました。', 'error')
+        } else {
+          snackBarDisplay('固定経費の削除が失敗しました。', 'error')
         }
       })
       .catch(() => {
-        if (flg === 1) {
+        if (flg === 0) {
           snackBarDisplay('取引先の削除が失敗しました。', 'error')
+        } else if (flg === 1) {
+          snackBarDisplay('品目の削除が失敗しました。', 'error')
         } else {
           snackBarDisplay('固定経費の削除が失敗しました。', 'error')
         }
@@ -396,7 +405,7 @@ const createGlobalState = (userId: string) => {
       .post<RecordsManagement[]>(
         `/api${connectPathChangeYearRecordsManagement}`,
         {
-          key: { id: globalState.workInfo[0].id, y: year },
+          key: { id: globalState.workInfo.id, y: year },
         }
       )
       .then((res) => {
@@ -421,51 +430,7 @@ const createGlobalState = (userId: string) => {
         )
       })
   }
-  // 事業所切り替え
-  const changeWorksRecordsManagement = async (workId: string) => {
-    const nowDateTime = new Date().toISOString()
-    await axios
-      .post<WorkChange>(`/api${connectPathChangeWorksRecordsManagement}`, {
-        key: {
-          id: workId,
-          y: globalState.currentSysYear.num,
-          now: nowDateTime,
-        },
-      })
-      .then((res) => {
-        globalState.workRecordsManagement = res.data.workRecordsManagement
-        globalState.clientsAndCostsInfo = res.data.clientsAndCostsInfo
-        globalState.workInfo.filter(
-          (f) => f.id === workId
-        )[0].last = nowDateTime
 
-        // ソート
-        globalState.workInfo.sort((n1, n2) => {
-          if (n1.last > n2.last) {
-            return -1
-          }
-          if (n1.last < n2.last) {
-            return 1
-          }
-          return 0
-        })
-        // ソート
-        globalState.workRecordsManagement.sort((n1, n2) => {
-          if (n1.day > n2.day) {
-            return -1
-          }
-          if (n1.day < n2.day) {
-            return 1
-          }
-          return 0
-        })
-
-        snackBarDisplay('事業所を切り替えました。', '')
-      })
-      .catch(() => {
-        snackBarDisplay('事業所の切り替えができませんでした。', 'error')
-      })
-  }
   // スナックバー表示
   const snackBarDisplay = (message: string, color: string) => {
     globalState.snackInfo.text = message
@@ -491,14 +456,13 @@ const createGlobalState = (userId: string) => {
     setGrobalStateCall,
     insertMyOffice,
     updateMyOffice,
-    deleteMyOffice,
     insertRecordManagement,
     updateRecordManagement,
     deleteRecordManagement,
+    isUsedByRecordsManagement,
     insertClientCost,
     updateClientCost,
     deleteClientCost,
-    changeWorksRecordsManagement,
     changeYearRecordsManagement,
     snackBarDisplay,
   }
@@ -514,7 +478,6 @@ export const getDefaultWork = (authId: string): Promise<Works> =>
           resolve({
             id: data.data.id,
             name: data.data.name,
-            last: data.data.last,
           })
         } else {
           reject(new Error('NG'))

@@ -91,7 +91,7 @@
                     >：取引内訳（以下1つのみ入力）</span
                   ><span class="red--text ml-1">*</span>
                   <span v-if="validErrFlg" class="red--text ml-3"
-                    >※いづれか入力必須です</span
+                    >※いずれか入力必須です</span
                   >
                 </v-card-title>
                 <v-col cols="12" class="py-0">
@@ -329,7 +329,7 @@ export default defineComponent({
       if (num === 0) {
         userState.insertClientCost({
           id: '',
-          wid: userState.workInfo.value[0].id,
+          wid: userState.workInfo.value.id,
           name: state.inputClientAndCostValueAry[n],
           iflg: n,
           color: '#' + Math.floor(Math.random() * 16777215).toString(16),
@@ -409,7 +409,7 @@ export default defineComponent({
         'exec',
         {
           id: state.id,
-          wid: userState.workInfo.value[0].id,
+          wid: userState.workInfo.value.id,
           pay: Number(state.inputPay.replaceAll(',', '')),
           sid: state.inputSubject,
           day: state.inputDate,
@@ -441,8 +441,8 @@ export default defineComponent({
       userState,
       cancelDialog,
       execCash,
-      repNumber,
       deleteRecord,
+      repNumber,
     }
   },
 })

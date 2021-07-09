@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="dialog" max-width="500px">
+  <v-dialog v-model="dialog" persistent max-width="500px">
     <template #activator="{ on, attrs }">
       <v-icon
         small
@@ -7,6 +7,7 @@
         class="ml-sm-3 text-sm-caption font-weight-bold"
         v-bind="attrs"
         v-on="on"
+        @click="checkCanDeleteClientCost()"
       >
         mdi-greater-than
       </v-icon>
@@ -16,6 +17,7 @@
       :dialog="dialog"
       :title="title"
       :subtitle="subtitle"
+      :delete-flg="canDelete"
       :continue-flg="false"
       :iflg="iflg"
       btn-name="更新"
@@ -52,12 +54,14 @@ export default defineComponent({
       required: true,
     },
   },
-  setup() {
+  setup(props: { defaultRecord: ClientsAndCosts }) {
     const useState = useGlobalState()
     const state = reactive<{
       dialog: boolean
+      canDelete: boolean
     }>({
       dialog: false,
+      canDelete: false,
     })
     const dialogOpenClose = (v: boolean) => {
       state.dialog = v
@@ -68,10 +72,22 @@ export default defineComponent({
       useState.updateClientCost(record)
     }
 
+    // 取引先固定経費が取引管理で使用されているか
+    const checkCanDeleteClientCost = () => {
+      useState.isUsedByRecordsManagement(props.defaultRecord.id).then((res) => {
+        if (res !== '0') {
+          state.canDelete = false
+        } else {
+          state.canDelete = true
+        }
+      })
+    }
+
     return {
       ...toRefs(state),
       dialogOpenClose,
       updateClientCost,
+      checkCanDeleteClientCost,
     }
   },
 })

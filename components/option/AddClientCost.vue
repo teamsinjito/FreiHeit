@@ -1,6 +1,6 @@
 <template>
   <!-- 取引先追加ボタン ダイアログ -->
-  <v-dialog v-model="dialog" max-width="500px">
+  <v-dialog v-model="dialog" persistent max-width="500px">
     <template #activator="{ on, attrs }">
       <v-btn
         color="primary"
@@ -17,6 +17,7 @@
       :dialog="dialog"
       :title="title"
       :subtitle="subtitle"
+      :delete-flg="false"
       :continue-flg="true"
       :iflg="iflg"
       btn-name="登録"

@@ -86,9 +86,30 @@
                   </v-row>
                 </v-expansion-panel-content>
               </v-expansion-panel>
+              <v-expansion-panel :key="2">
+                <v-expansion-panel-header color="primary" class="white--text">
+                  省略設定
+                </v-expansion-panel-header>
+                <v-expansion-panel-content class="pt-5">
+                  <v-row>
+                    <v-col cols="12">
+                      <v-checkbox
+                        v-model="otherCheck"
+                        hide-details
+                        :disabled="targetData.length < 5"
+                        class="mt-6 ml-1"
+                      >
+                        <template #label>
+                          <span class="text-caption">その他で纏める</span>
+                        </template>
+                      </v-checkbox>
+                    </v-col>
+                  </v-row>
+                </v-expansion-panel-content>
+              </v-expansion-panel>
             </v-col>
             <v-col cols="12" md="9">
-              <v-expansion-panel :key="2">
+              <v-expansion-panel :key="3">
                 <v-expansion-panel-header color="primary" class="white--text">
                   グラフ
                 </v-expansion-panel-header>
@@ -137,16 +158,32 @@ export default defineComponent({
       sliderEnd: number
       selectSubject: string
       subjectItems: string[] | undefined
+      targetData:
+        | {
+            id: string
+            name: string
+            color: string
+          }[]
+        | undefined
+      chartData: {
+        label: string
+        data: number[]
+        backgroundColor: string
+      }[]
       barChartData: barType | undefined
       pieChartData: pieType | undefined
+      otherCheck: boolean
     }>({
-      panel: [0, 1, 2],
+      panel: [0, 1, 2, 3],
       sliderStart: 1,
       sliderEnd: 12,
       selectSubject: '仕入',
       subjectItems: [],
+      targetData: [],
+      chartData: [],
       barChartData: undefined,
       pieChartData: undefined,
+      otherCheck: false,
     })
     const sliderStartRules = [
       (val: number) =>
@@ -178,6 +215,11 @@ export default defineComponent({
     }
 
     const getFilteringData = () => {
+      // *********************************************************************
+      // チャートデータをリセット
+      // *********************************************************************
+      state.chartData = []
+
       // *********************************************************************
       // 対象データのみを使用するためにフィルタリング
       // *********************************************************************
@@ -217,7 +259,7 @@ export default defineComponent({
       ).sort()
 
       // 対象取引先名or対象固定経費名
-      const targetClientsAndCosts = Array.from(
+      state.targetData = Array.from(
         new Set(
           globalState.clientsAndCostsInfo.value
             .filter((info) => {
@@ -243,13 +285,24 @@ export default defineComponent({
       // *********************************************************************
       // チャートデータ用のデータ整形
       // *********************************************************************
-      const chartData = targetClientsAndCosts.map((item) => {
+      const otherChartData: {
+        label: string
+        data: number[]
+        backgroundColor: string
+      } = {
+        label: 'その他',
+        data: [],
+        backgroundColor: '#d3d3d3',
+      }
+
+      state.targetData.forEach((item) => {
         const chartLabel = item.name
 
-        const chartData = targetMonth.map((month) => {
+        const targetMonthData = targetMonth.map((month) => {
           const shapingTargetData = shapingData.filter((data) => {
             return data.cid === item.id
           })
+
           const targetCost = shapingTargetData
             .filter((data) => {
               return data.day.substring(0, 7) === month
@@ -257,46 +310,84 @@ export default defineComponent({
             .map((val) => {
               return val.pay
             })
+
           const cost =
             targetCost.length > 0
               ? targetCost.reduce(
                   (pVal: number, cVal: number): number => pVal + cVal
                 )
               : 0
+
           return cost
         })
 
         const chartBackgroundColor = item.color
 
-        return {
+        state.chartData.push({
           label: chartLabel,
-          data: chartData,
+          data: targetMonthData,
           backgroundColor: chartBackgroundColor,
-        }
+        })
       })
+
+      if (state.otherCheck) {
+        // 金額順に並び替え
+        state.chartData.sort((a, b) => {
+          return (
+            b.data.reduce((prev, current) => prev + current, 0) -
+            a.data.reduce((prev, current) => prev + current, 0)
+          )
+        })
+
+        // その他データ生成
+        state.chartData.forEach((data, index) => {
+          if (index >= 4) {
+            // 初回時は「otherChartData.data」が空なのでpushで追加
+            if (otherChartData.data.length === 0) {
+              otherChartData.data = data.data
+            } else {
+              // 既にデータが存在している際は、その値に加算していく
+              otherChartData.data.forEach((_, index) => {
+                otherChartData.data[index] += data.data[index]
+              })
+            }
+            delete state.chartData[index]
+          }
+        })
+
+        // その他データに使用したものを省く
+        state.chartData = state.chartData.filter((_, index) => {
+          return index < 4
+        })
+
+        // その他データ追加
+        if (otherChartData.data.length > 0) {
+          state.chartData.push(otherChartData)
+        }
+      }
 
       const barChartData = {
         labels: targetMonth,
-        datasets: chartData.concat(),
+        datasets: state.chartData.concat(),
       }
 
       let allcost = 0
-      chartData.forEach((data) => {
+      state.chartData.forEach((data) => {
         data.data.forEach((val) => {
           allcost += Number(val)
         })
       })
 
       const pieChartData = {
-        labels: chartData.map((data) => {
+        labels: state.chartData.map((data) => {
           return data.label
         }),
         datasets: [
           {
-            backgroundColor: chartData.map((data) => {
+            backgroundColor: state.chartData.map((data) => {
               return data.backgroundColor
             }),
-            data: chartData.map((data) => {
+            data: state.chartData.map((data) => {
               const targetCost = data.data.reduce(
                 (pVal, cVal) => Number(pVal) + Number(cVal)
               )
@@ -322,6 +413,7 @@ export default defineComponent({
           start: state.sliderStart,
           end: state.sliderEnd,
           subject: state.selectSubject,
+          check: state.otherCheck,
         }
       },
       () => {

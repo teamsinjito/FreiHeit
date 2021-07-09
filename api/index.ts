@@ -34,9 +34,7 @@ export const pool = new pg.Pool({
   password: env.DB_PASSWORD,
   host: env.DB_HOST,
   port: Number(env.DB_PORT),
-  ssl: { rejectUnauthorized: false },
 })
-
 config()
 
 configure({
@@ -44,9 +42,7 @@ configure({
   categories: { default: { appenders: ['app'], level: 'error' } },
 })
 const logger = getLogger()
-
-// app.set('port', process.env.PORT || 8083)
-// app.listen(app.get('port'))
+app.listen(8083)
 app.use(express.json())
 
 app.post(connectDefaultWorks, async (req: Request, res) => {

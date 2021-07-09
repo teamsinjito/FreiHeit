@@ -70,9 +70,10 @@
                 outlined
                 required
                 :rules="payRules"
-                type="number"
+                type="text"
                 suffix="円"
                 dense
+                @input="repNumber"
                 ><template #[`label`]>
                   <label class="text-caption"
                     ><v-icon class="text-caption"
@@ -361,7 +362,7 @@ export default defineComponent({
       valid: boolean
       id: string
       checkbox: boolean
-      inputPay: number
+      inputPay: string
       inputDate: string
       inputSubject: string
       inputClientAndCost: string
@@ -375,7 +376,7 @@ export default defineComponent({
       id: props.defaultRecords.id,
       checkbox: props.continueFlg,
       inputDate: props.defaultRecords.day,
-      inputPay: props.defaultRecords.pay,
+      inputPay: props.defaultRecords.pay.toLocaleString().toString(),
       inputSubject: props.defaultRecords.sid,
       inputClientAndCost: props.defaultRecords.cid,
       inputClientAndCostValue: '',
@@ -385,11 +386,11 @@ export default defineComponent({
       validErrFlg: false,
     })
     // 金額の3桁区切り変換
-    // const repNumber = () => {
-    //   state.inputPay = Number(
-    //     state.inputPay.replaceAll(',', '')
-    //   ).toLocaleString()
-    // }
+    const repNumber = () => {
+      state.inputPay = Number(
+        state.inputPay.replaceAll(',', '')
+      ).toLocaleString()
+    }
 
     const cancelDialog = () => {
       context.emit('open-close', !props.dialog)
@@ -409,7 +410,7 @@ export default defineComponent({
         {
           id: state.id,
           wid: userState.workInfo.value.id,
-          pay: state.inputPay,
+          pay: Number(state.inputPay.replaceAll(',', '')),
           sid: state.inputSubject,
           day: state.inputDate,
           cid: state.inputClientAndCostValue,
@@ -441,6 +442,7 @@ export default defineComponent({
       cancelDialog,
       execCash,
       deleteRecord,
+      repNumber,
     }
   },
 })

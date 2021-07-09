@@ -113,7 +113,6 @@ export default defineComponent({
     const userState = useGlobalState()
     // 関数群
     const switchNavVar = (m: boolean) => {
-      console.log(m)
       state.mini = m
     }
     const dialogOpenClose = (v: boolean) => {
